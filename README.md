@@ -1,18 +1,13 @@
 
-## This a POC app to show how to integrate MongoDB to Node JS and use Socket.io
-<b>Description in few words</b>, the app let you create houses using basic geometrial shapes.
+## App little constructor
+ 
+App that let you create houses using basic geometrial shapes.
 
-Enjoy at: [http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html](http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html)
-
-### Index
-* Motivation
-* How to download the code and make a new version.
-* Code explanation.
-* References 
-* Contact
+## Enjoy at
+[http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html](http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html)
 
 ## Motivation
-- Make my own javascript version of javid's 3D engine.
+- Make my own javascript version of Javidx9's 3D engine.
 - Make a virtual version of the game "casitasfrm"
 
 <table border="0">
@@ -44,14 +39,14 @@ Still under constructoin.
 
 ## References
 
-javid tutorial: [https://www.youtube.com/watch?v=ih20l3pJoeU]  (https://www.youtube.com/watch?v=ih20l3pJoeU)
+* Javidx9 tutorial: [https://www.youtube.com/watch?v=ih20l3pJoeU](https://www.youtube.com/watch?v=ih20l3pJoeU)
 
 ## Contact
 
-*site: https://mfontanadev.github.io/about.html
+* site: [https://mfontanadev.github.io/about.html](https://mfontanadev.github.io/about.html)
 
-*twitter: https://twitter.com/mfontanadev
+* twitter: [https://twitter.com/mfontanadev](https://twitter.com/mfontanadev)
 
-*git: git
+* git: [https://github.com/mfontanadev](https://github.com/mfontanadev)
 
-*linkedin: https://www.linkedin.com/in/mauricio-fontana-8285681b/?originalSubdomain=ar
+* linkedin: [https://www.linkedin.com/in/mauricio-fontana-8285681b/?originalSubdomain=ar](https://www.linkedin.com/in/mauricio-fontana-8285681b/?originalSubdomain=ar)
