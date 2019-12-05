@@ -1,20 +1,27 @@
 
 ## This a POC app to show how to integrate MongoDB to Node JS and use Socket.io
-Explanation in few words, the app let you send wishes (using REST messages) and see them in a wish tree.
+<b>Description in few words</b>, the app let you create houses using basic geometrial shapes.
 
 Enjoy at: [http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html](http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html)
 
-### Motivation
-- Make my own javascript version of javid engine.
+### Index
+* Motivation
+* How to download the code and make a new version.
+* Code explanation.
+* References 
+* Contact
+
+## Motivation
+- Make my own javascript version of javid's 3D engine.
 - Make a virtual version of the game "casitasfrm"
 
-<table>
+<table border="0">
 	<tr>
 		<td align="center">
-		<img width="240px" src="https://github.com/mfontanadev/wishflower/blob/master/doc/coccinellidae.PNG?raw=true">
+		<img width="260px" src="https://github.com/mfontanadev/appLittleConstructor/blob/master/doc/poc_house_leftside.png?raw=true">
 		</td>
 		<td align="center">
-		<img width="240px" src="https://github.com/mfontanadev/wishflower/blob/master/doc/coccinellidae.PNG?raw=true">
+		<img width="190px" src="https://github.com/mfontanadev/appLittleConstructor/blob/master/doc/poc_house_rightside.png?raw=true?raw=true">
 		</td>
 	</tr>
 	<tr>
@@ -27,12 +34,24 @@ Enjoy at: [http://mfontanadevhome.appspot.com/games/deployLittleConstructor/inde
 	</tr>
 </table>
 
-## Documentation
+## How to download the code and make a new versinn.
 
-For more information about using Node.js on Heroku, see these Dev Center articles:
+Still under constructoin.
 
-- [Getting Started with Node.js on Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs)
-- [Heroku Node.js Support](https://devcenter.heroku.com/articles/nodejs-support)
-- [Node.js on Heroku](https://devcenter.heroku.com/categories/nodejs)
-- [Best Practices for Node.js Development](https://devcenter.heroku.com/articles/node-best-practices)
-- [Using WebSockets on Heroku with Node.js](https://devcenter.heroku.com/articles/node-websockets)
+## Code explanation.
+
+Still under constructoin.
+
+## References
+
+javid tutorial: [https://www.youtube.com/watch?v=ih20l3pJoeU]  (https://www.youtube.com/watch?v=ih20l3pJoeU)
+
+## Contact
+
+*site: https://mfontanadev.github.io/about.html
+
+*twitter: https://twitter.com/mfontanadev
+
+*git: git
+
+*linkedin: https://www.linkedin.com/in/mauricio-fontana-8285681b/?originalSubdomain=ar
