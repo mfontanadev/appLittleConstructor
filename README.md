@@ -12,10 +12,10 @@ App that let you create houses using basic geometrial shapes. Do not forget use 
 
 <table>
 	<tr>
-		<th align="center">
+		<th width="360px" align="center">
 		<img width="260px" src="https://github.com/mfontanadev/appLittleConstructor/blob/master/doc/poc_house_leftside.png?raw=true">
 		</th>
-		<th align="center">
+		<th width="360px" align="center">
 		<img width="190px" src="https://github.com/mfontanadev/appLittleConstructor/blob/master/doc/poc_house_rightside.png?raw=true?raw=true">
 		</th>
 	</tr>
