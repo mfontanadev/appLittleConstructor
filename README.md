@@ -21,10 +21,10 @@ App that let you create houses using basic geometrial shapes. Do not forget use 
 	</tr>
 	<tr>
 		<th align="center">
-			Digital version exmaple
+			Digital version example
 		</th>
 		<th align="center">
-			Real version exmaple
+			Real version example
 		</th>
 	</tr>
 </table>
