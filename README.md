@@ -1,7 +1,7 @@
 
-## App little constructor
+# App "Little constructor"
  
-App that let you create houses using basic geometrial shapes.
+App that let you create houses using basic geometrial shapes. Do not forget use camera to go inside it.
 
 ## Enjoy at
 [http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html](http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html)
@@ -10,32 +10,32 @@ App that let you create houses using basic geometrial shapes.
 - Make my own javascript version of Javidx9's 3D engine.
 - Make a virtual version of the game "casitasfrm"
 
-<table border="0">
+<table>
 	<tr>
-		<td align="center">
+		<th align="center">
 		<img width="260px" src="https://github.com/mfontanadev/appLittleConstructor/blob/master/doc/poc_house_leftside.png?raw=true">
-		</td>
-		<td align="center">
+		</th>
+		<th align="center">
 		<img width="190px" src="https://github.com/mfontanadev/appLittleConstructor/blob/master/doc/poc_house_rightside.png?raw=true?raw=true">
-		</td>
+		</th>
 	</tr>
 	<tr>
-		<td align="center">
-			My version
-		</td>
-		<td align="center">
-			Real version
-		</td>
+		<th align="center">
+			Digital version exmaple
+		</th>
+		<th align="center">
+			Real version exmaple
+		</th>
 	</tr>
 </table>
 
 ## How to download the code and make a new versinn.
 
-Still under constructoin.
+Still under construction.
 
 ## Code explanation.
 
-Still under constructoin.
+I think I will make a tutorial. There are multiples concepts in this app, for example: 3D Engine from scratch in javascript, mini framework (a class with some utilities) for game dev, classes to interac with the 3D engine and a layer to manipulate objects acoording to house creation (it can be modified to make a city builder or whatever)
 
 ## References
 
@@ -50,3 +50,4 @@ Still under constructoin.
 * git: [https://github.com/mfontanadev](https://github.com/mfontanadev)
 
 * linkedin: [https://www.linkedin.com/in/mauricio-fontana-8285681b/?originalSubdomain=ar](https://www.linkedin.com/in/mauricio-fontana-8285681b/?originalSubdomain=ar)
+
