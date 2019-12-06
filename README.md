@@ -29,7 +29,7 @@ App that let you create houses using basic geometrial shapes. Do not forget use 
 	</tr>
 </table>
 
-## How to download the code and make a new versinn.
+## How to download the code and make a new version.
 
 Still under construction.
 
