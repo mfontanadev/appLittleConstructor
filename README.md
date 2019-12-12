@@ -29,11 +29,22 @@ App that let you create houses using basic geometrial shapes. Do not forget use 
 	</tr>
 </table>
 
-## How to download the code and make a new version.
+## Building a new version
 
-Still under construction.
+The idea is merge all files in one only big .js file. To do that, you can use batch files or make your own merge. You can use merge process for you own porpouses, if you want. So, follow the next steps:
 
-## Code explanation.
+1. Go to root dir and locate combinetype.bat (this works on Windows). Run as is, with no arguments.
+NOTE: if you want to set version number, please modify this line "var C_VERSION_TITLE = "Little constructor (based on JSEngine) v1.2";", this is a very simple way to identify it at running time.
+
+2. You must see a new file called appLittleConstructor.js.
+
+Ok, that was easy, but let me explain some of the "my merge way" details.
+
+* First, to identify classes inside the fat file I use a separator made of three comment lines, this is generated automatically.  
+
+* Second, all .obj files must be converted to .var and then added to mockedObj.js. This is achieved with a converter tool called file2var.jar (personal cooking).
+
+## Code explanation
 
 I think I will make a tutorial. There are multiples concepts in this app, for example: 3D Engine from scratch in javascript, mini framework (a class with some utilities) for game dev, classes to interac with the 3D engine and a layer to manipulate objects acoording to house creation (it can be modified to make a city builder or whatever)
 
