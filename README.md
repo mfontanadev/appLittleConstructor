@@ -54,7 +54,7 @@ I think I will make a tutorial. There are multiples concepts in this app, for ex
 
 ## Contact
 
-* site: [https://mfontanadev.github.io/about.html](https://mfontanadev.github.io/about.html)
+* site: [https://mfontanadev.github.io/about.html](https://mfontanadev.github.io)
 
 * twitter: [https://twitter.com/mfontanadev](https://twitter.com/mfontanadev)
 
