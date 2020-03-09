@@ -4,7 +4,7 @@
 App that let you create houses using basic geometrial shapes. Do not forget use camera to go inside it.
 
 ## Enjoy at
-[http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html](http://mfontanadevhome.appspot.com/games/deployLittleConstructor/index.html)
+[http://mfontanadev.github.io/games/deployLittleConstructor/index.html](http://mfontanadev.github.io/games/deployLittleConstructor/index.html)
 
 ## Motivation
 - Make my own javascript version of Javidx9's 3D engine.
