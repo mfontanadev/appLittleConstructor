@@ -109,7 +109,7 @@ PieceFactory.prototype.getCURSOR = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/cursorMark.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("cursorMark.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, 1, 0);
     newMesh.setZOrder(9999);
     newMesh.color(255, 255, 0, 1);
@@ -127,7 +127,7 @@ PieceFactory.prototype.getBOARD = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/BOARD.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("BOARD.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY() * -1, 0);
 
     piece.mesh = newMesh;
@@ -142,7 +142,7 @@ PieceFactory.prototype.getDOOR = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/DOOR.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("DOOR.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -157,7 +157,7 @@ PieceFactory.prototype.getWINDOW = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/WINDOW.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("WINDOW.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -172,7 +172,7 @@ PieceFactory.prototype.getSOCLE = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/SOCLE.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("SOCLE.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -188,7 +188,7 @@ PieceFactory.prototype.getPILAR_TALL = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/PILAR_TALL.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("PILAR_TALL.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -204,7 +204,7 @@ PieceFactory.prototype.getPILAR_MEDIUM = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/PILAR_MEDIUM.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("PILAR_MEDIUM.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -220,7 +220,7 @@ PieceFactory.prototype.getPILAR_SMALL = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/PILAR_SMALL.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("PILAR_SMALL.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -235,7 +235,7 @@ PieceFactory.prototype.getRAILING = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/RAILING.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("RAILING.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -250,7 +250,7 @@ PieceFactory.prototype.getCABRIADA = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/CABRIADA.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("CABRIADA.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -265,7 +265,7 @@ PieceFactory.prototype.getCABRIADAB = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/CABRIADA.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("CABRIADA.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
     newMesh.setAngleY(JSGameEngine.graToRad(90));
 
@@ -281,7 +281,7 @@ PieceFactory.prototype.getROOF = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/ROOF.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("ROOF.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -296,7 +296,7 @@ PieceFactory.prototype.getROOFB = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/ROOF.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("ROOF.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
     newMesh.setAngleY(JSGameEngine.graToRad(90));
 
@@ -312,7 +312,7 @@ PieceFactory.prototype.getFLOOR = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/FLOOR.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("FLOOR.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;

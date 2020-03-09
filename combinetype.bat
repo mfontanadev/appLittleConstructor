@@ -29,10 +29,12 @@ call java -jar file2var.jar -i %OBJ_DIR%\CABRIADA.OBJ -o %OBJ_DIR%\CABRIADA.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\PILAR_TALL.OBJ -o %OBJ_DIR%\PILAR_TALL.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\PILAR_MEDIUM.OBJ -o %OBJ_DIR%\PILAR_MEDIUM.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\PILAR_SMALL.OBJ -o %OBJ_DIR%\PILAR_SMALL.VAR
+call java -jar file2var.jar -i %OBJ_DIR%\PILAR_SMALL.mtl -o %OBJ_DIR%\PILAR_SMALL_MTL.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\ROOF.OBJ -o %OBJ_DIR%\ROOF.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\BOARD.OBJ -o %OBJ_DIR%\BOARD.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\DOOR.OBJ -o %OBJ_DIR%\DOOR.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\WINDOW.OBJ -o %OBJ_DIR%\WINDOW.VAR
+call java -jar file2var.jar -i %OBJ_DIR%\WINDOW.mtl -o %OBJ_DIR%\WINDOW_MTL.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\SOCLE.OBJ -o %OBJ_DIR%\SOCLE.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\FLOOR.OBJ -o %OBJ_DIR%\FLOOR.VAR
 call java -jar file2var.jar -i %OBJ_DIR%\house.bpl -o %OBJ_DIR%\house.var
@@ -47,25 +49,28 @@ echo var mockedObj = new Map(); >> %JS_DIR%\%MOCKED_FILE%
 echo var item = ""; >> %JS_DIR%\%MOCKED_FILE%
 echo. >> %JS_DIR%\%MOCKED_FILE%
 
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% CABRIADA .obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% cursorMark cursorMark.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% groundMark groundMark.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% holeMark holeMark.obj
 
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% cursorMark .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% groundMark .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% holeMark .obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% RAILING RAILING.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% CABRIADA CABRIADA.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% PILAR_TALL PILAR_TALL.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% PILAR_MEDIUM PILAR_MEDIUM.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% PILAR_SMALL PILAR_SMALL.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% ROOF ROOF.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% BOARD BOARD.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% DOOR DOOR.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% WINDOW WINDOW.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% FLOOR FLOOR.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% SOCLE SOCLE.obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% house HOUSE.bpl
 
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% RAILING .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% CABRIADA .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% PILAR_TALL .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% PILAR_MEDIUM .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% PILAR_SMALL .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% ROOF .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% BOARD .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% DOOR .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% WINDOW .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% FLOOR .obj
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% SOCLE .obj
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% WINDOW_MTL WINDOW.mtl
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% WINDOW_JPG window.jpg
 
-call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% house .bpl
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% PILAR_SMALL_MTL PILAR_SMALL.mtl
+call addToMockedFile.bat %JS_DIR%\%MOCKED_FILE% %OBJ_DIR% PILAR_SMALL_JPG oak.jpg
 
 call addFileWithHeader.bat %OUTPUTFILE% %JS_DIR% mockedObj.js 
 call addFileWithHeader.bat %OUTPUTFILE% %JS_DIR% app.js 

@@ -978,12 +978,14 @@ Space.prototype.drawTriangles = function(_listTriangles)
                                       p1.x, p1.y, t1.u, t1.v, t1.w,
                                       p2.x, p2.y, t2.u, t2.v, t2.w, _listTriangles[i].imgDataTexture);
             }
-
-            if (this.renderMode === Space.C_RENDER_MODE_TRIANGLE_FILL)
-                gEngine.fillTriangle(	p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, JSGameEngine.PIXEL_SOLID, _listTriangles[i].faceColorRender);
             else
-                gEngine.fillTriangleCustom(	p0.x, p0.y, p0.w, p1.x, p1.y, p1.w, p2.x, p2.y, p2.w, _listTriangles[i].faceColorRenderRGBA);
-
+            {
+                if (this.renderMode === Space.C_RENDER_MODE_TRIANGLE_FILL)
+                    gEngine.fillTriangle(	p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, JSGameEngine.PIXEL_SOLID, _listTriangles[i].faceColorRender);
+                else
+                    gEngine.fillTriangleCustom(	p0.x, p0.y, p0.w, p1.x, p1.y, p1.w, p2.x, p2.y, p2.w, _listTriangles[i].faceColorRenderRGBA);
+            }
+            
             if (this.linesVisible === true)
                 gEngine.drawTriangle(	p0.x, p0.y, p1.x, p1.y, p2.x, p2.y,	JSGameEngine.PIXEL_SOLID, "gray");
         }

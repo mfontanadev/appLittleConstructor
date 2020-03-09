@@ -110,10 +110,25 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
     var cacheColorVertexes = new Array();
     var cacheVertexes = new Array();
     var cacheVertexTextures = new Array();
+    var cacheFaces = new Array();
     var splitted = _meshData.split("\n");
+    var materialFile = "";
+    var cacheMaterialsName = new Array();
 
-    for (var i = 0; i < splitted.length - 1; i++) 
+    for (var i = 0; i < splitted.length; i++) 
     {
+           if (splitted[i].substring(0,7) == "mtllib ")
+           {
+               var splittedRow = splitted[i].split(" ");
+               materialFile = splittedRow[1];
+           }
+
+           if (splitted[i].substring(0,7) == "usemtl ")
+           {
+               var splittedRow = splitted[i].split(" ");
+               cacheMaterialsName.push(splittedRow[1]);
+           }
+
            if (splitted[i].substring(0,2) == "v ")
            {
                var splittedRow = splitted[i].split(" ");
@@ -159,54 +174,160 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
                var v = 0;
                var vt = 0;
 
-               // Mesh with texture data.
                if (splittedFace[1].split("/").length > 1)
                {
-                   v1 = splittedFace[1].split("/")[0];
-                   vt1 = splittedFace[1].split("/")[1];
-                   v2 = splittedFace[2].split("/")[0];
-                   vt2 = splittedFace[2].split("/")[1];
-                   v3 = splittedFace[3].split("/")[0];
-                   vt3 = splittedFace[3].split("/")[1];
+                   v1 = parseFloat(splittedFace[1].split("/")[0]) - 1;
+                   vt1 = parseFloat(splittedFace[1].split("/")[1]) - 1;
+                   v2 = parseFloat(splittedFace[2].split("/")[0]) - 1;
+                   vt2 = parseFloat(splittedFace[2].split("/")[1]) - 1;
+                   v3 = parseFloat(splittedFace[3].split("/")[0]) - 1;
+                   vt3 = parseFloat(splittedFace[3].split("/")[1]) - 1;
 
-                   var tri = this.createNewTriangleWithPoints(cacheVertexes[parseFloat(v1) - 1],  
-                                                              cacheVertexes[parseFloat(v2) - 1], 
-                                                              cacheVertexes[parseFloat(v3) - 1]);
-
-                   tri.setTexture( new Vector2D(	cacheVertexTextures[parseFloat(vt1) - 1].x, 
-                                                   cacheVertexTextures[parseFloat(vt1) - 1].y, 
-                                                1),
-
-                                   new Vector2D(	cacheVertexTextures[parseFloat(vt2) - 1].x, 
-                                                   cacheVertexTextures[parseFloat(vt2) - 1].y, 
-                                                1),
-
-                                   new Vector2D(	cacheVertexTextures[parseFloat(vt3) - 1].x, 
-                                                   cacheVertexTextures[parseFloat(vt3) - 1].y,
-                                                1));
-                   tri.useTexture = true;
+                   cacheFaces.push({V1: v1, VT1: vt1, V2: v2, VT2: vt2, V3: v3, VT3: vt3, useTexture: true});
                }
                else
                {
-                   var tri = this.createNewTriangleWithPoints(cacheVertexes[parseFloat(splittedFace[1]) - 1],  
-                                                              cacheVertexes[parseFloat(splittedFace[2]) - 1], 
-                                                              cacheVertexes[parseFloat(splittedFace[3]) - 1]);
+                   v1 = parseFloat(splittedFace[1]) - 1;
+                   v2 = parseFloat(splittedFace[2]) - 1;
+                   v3 = parseFloat(splittedFace[3]) - 1;
 
-                   var vertexColor = cacheColorVertexes[parseFloat(splittedFace[1]) - 1];
-                   if (vertexColor !== null && vertexColor.colored === true)
-                   {
-                       tri.faceColor.r = vertexColor.x;
-                       tri.faceColor.g = vertexColor.y;
-                       tri.faceColor.b = vertexColor.z;
-                       tri.faceColor.a = vertexColor.w;
-                   }
+                   cacheFaces.push({V1: v1, VT1: 0, V2: v2, VT2: 0, V3: v3, VT3: 0, useTexture: false});
                }
-
-               this.addTriangle(tri);
            }
     }   
 
+    for (var i = 0; i < cacheFaces.length; i++) 
+    {
+        if (cacheFaces[i].useTexture === true)
+        {
+               v1 = cacheFaces[i].V1;
+               vt1 = cacheFaces[i].VT1;
+               v2 = cacheFaces[i].V2;
+               vt2 = cacheFaces[i].VT2;
+               v3 = cacheFaces[i].V3;
+               vt3 = cacheFaces[i].VT3;
+
+               var tri = this.createNewTriangleWithPoints(cacheVertexes[v1],  
+                                                          cacheVertexes[v2], 
+                                                          cacheVertexes[v3]);
+
+               tri.setTexture( new Vector2D(	cacheVertexTextures[vt1].x, 
+                                               cacheVertexTextures[vt1].y, 
+                                            1),
+
+                               new Vector2D(	cacheVertexTextures[vt2].x, 
+                                               cacheVertexTextures[vt2].y, 
+                                            1),
+
+                               new Vector2D(	cacheVertexTextures[vt3].x, 
+                                               cacheVertexTextures[vt3].y,
+                                            1));
+            
+               tri.useTexture = true;
+        }
+        else
+        {
+            v1 = cacheFaces[i].V1;
+            v2 = cacheFaces[i].V2;
+            v3 = cacheFaces[i].V3;
+
+            var tri = this.createNewTriangleWithPoints(cacheVertexes[v1], cacheVertexes[v2], cacheVertexes[v3]);
+            var vertexColor = cacheColorVertexes[v1];
+            if (vertexColor !== null && vertexColor.colored === true)
+            {
+                tri.faceColor.r = vertexColor.x;
+                tri.faceColor.g = vertexColor.y;
+                tri.faceColor.b = vertexColor.z;
+                tri.faceColor.a = vertexColor.w;
+            }
+        }
+
+        this.addTriangle(tri);
+    }
+
+    if (materialFile !== "" && cacheMaterialsName.length > 0)
+    {
+        this.loadTextureFromMaterialFile(materialFile, cacheMaterialsName);
+    }
+
     console.log("generateMeshFromFileData ",this.fileName, ", triangles count:", this.tris.length);			
+}
+
+Mesh.prototype.loadTextureFromMaterialFile = function(_fileName, _materialNames) 
+{
+    if (C_MOCK_MODE === true)
+    {
+        this.loadTextureFromMaterialFileMock(_fileName, _materialNames);
+    }
+    else
+    {
+        this.loadTextureFromMaterialFileServer(_fileName, _materialNames);
+    }
+}
+
+Mesh.prototype.loadTextureFromMaterialFileMock = function(_fileName, _materialNames) 
+{
+    this.fileName = JSGameEngine.resolveURLToResourceFolder(_fileName).toLowerCase();
+
+    if (mockedObj.has(this.fileName) === true)
+    {
+        var responseText = mockedObj.get(this.fileName);
+        responseText = responseText.replace(/&lf;/g, "\n");
+        this.parseMaterialFile(_fileName, responseText, _materialNames);	            
+    }
+}
+
+Mesh.prototype.loadTextureFromMaterialFileServer = function(_fileName, _materialNames) 
+{
+    var thisClass = this;
+    this.fileName = _fileName;
+
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", _fileName, false);
+    rawFile.onreadystatechange = function ()
+    {
+        var loadedOk = false;
+        var allText = "";
+
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                thisClass.parseMaterialFile(_fileName, rawFile.responseText, _materialNames);
+                loadedOk = true;
+            }
+        }
+    }
+    rawFile.send(null);
+}
+
+Mesh.prototype.parseMaterialFile = function(_fileName, _data, _materialsNames) 
+{
+    var splitted = _data.split("\n");
+
+    // File example
+    // newmtl Mat_0
+    // Kd 1.000000 1.000000 1.000000
+    // map_Kd jario_WithBorder_NoMipMap.png
+
+    for (var i = 0; i < splitted.length; i++) 
+    {
+           if (splitted[i].substring(0,7) == "newmtl ")
+           {
+               var splittedRow = splitted[i].split(" ");
+               materialName = splittedRow[1];
+               i = i + 2;		// Skeep two lines to map_Kd
+
+                if (splitted[i].substring(0,7) == "map_Kd ")
+                {
+                    splittedRow = splitted[i].split(" ");
+                    textureName = splittedRow[1];
+
+                    console.log("loaded texture from material", _fileName, ", texture name:", textureName);			
+                    this.loadTexture(textureName);
+                }							   		
+           }
+    }   
 }
 
 Mesh.prototype.color = function(_r, _g, _b, _a) 
@@ -439,6 +560,19 @@ Mesh.prototype.getScale = function()
 
 Mesh.prototype.loadTexture = function(_url) 
 {
+    var url = "";
+
+    if (C_MOCK_MODE === true)
+    {
+        var filename = JSGameEngine.resolveURLToResourceFolder(_url).toLowerCase();
+        url = mockedObj.get(filename); 
+    }
+
+    this.loadTextureFile(url);
+}
+
+Mesh.prototype.loadTextureFile = function(_url) 
+{
     var _this = this;
     this.imgTexture.onload = function () 
     {
@@ -462,9 +596,15 @@ Mesh.prototype.loadTexture = function(_url)
             _this.imgDataTexture = newContext.getImageData(0, 0,imgWidth, imgHeight);
         }
     }			
+
+    this.imgTexture.onerror = function(e)
+    {
+        console.log("Error loading image:");
+        console.log(e);
+    }	
+
     this.imgTexture.crossOrigin = "Anonymous";
     this.imgTexture.src = _url;
-
 }
 
 Mesh.prototype.isTextureLoaded = function() 

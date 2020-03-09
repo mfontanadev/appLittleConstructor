@@ -458,7 +458,7 @@ JSGameEngine.prototype.fillTriangleCustom = function(	x1, y1, w1, x2, y2, w2, x3
             var ax = x1 + (i - y1) * dax_step;
             var bx = x1 + (i - y1) * dbx_step;
 
-            var tex_sw = w2 + (i - y2) * dw1_step;
+            var tex_sw = w1 + (i - y1) * dw1_step;
             var tex_ew = w1 + (i - y1) * dw2_step;
 
             if (ax > bx)
@@ -505,7 +505,7 @@ JSGameEngine.prototype.fillTriangleCustom = function(	x1, y1, w1, x2, y2, w2, x3
             var ax = x2 + (i - y2) * dax_step;
             var bx = x1 + (i - y1) * dbx_step;
 
-            var tex_sw = w1 + (i - y1) * dw1_step;
+            var tex_sw = w2 + (i - y2) * dw1_step;
             var tex_ew = w1 + (i - y1) * dw2_step;
 
             if (ax > bx)
@@ -758,4 +758,10 @@ JSGameEngine.graToRad = function(grados)
 JSGameEngine.radToGra = function(radians)
 {
     return 180 * radians / Math.PI;
+}
+
+// Get an URL to the OBJ folder, adding SERVER IP and  PORT previous to the filename.
+JSGameEngine.resolveURLToResourceFolder = function(_filename)
+{
+    return 'http://'+ C_SERVER_IP + '/obj/' + _filename; 
 }

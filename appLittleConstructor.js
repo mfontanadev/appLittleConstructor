@@ -512,7 +512,7 @@ JSGameEngine.prototype.fillTriangleCustom = function(	x1, y1, w1, x2, y2, w2, x3
             var ax = x1 + (i - y1) * dax_step;
             var bx = x1 + (i - y1) * dbx_step;
 
-            var tex_sw = w2 + (i - y2) * dw1_step;
+            var tex_sw = w1 + (i - y1) * dw1_step;
             var tex_ew = w1 + (i - y1) * dw2_step;
 
             if (ax > bx)
@@ -559,7 +559,7 @@ JSGameEngine.prototype.fillTriangleCustom = function(	x1, y1, w1, x2, y2, w2, x3
             var ax = x2 + (i - y2) * dax_step;
             var bx = x1 + (i - y1) * dbx_step;
 
-            var tex_sw = w1 + (i - y1) * dw1_step;
+            var tex_sw = w2 + (i - y2) * dw1_step;
             var tex_ew = w1 + (i - y1) * dw2_step;
 
             if (ax > bx)
@@ -812,6 +812,12 @@ JSGameEngine.graToRad = function(grados)
 JSGameEngine.radToGra = function(radians)
 {
     return 180 * radians / Math.PI;
+}
+
+// Get an URL to the OBJ folder, adding SERVER IP and  PORT previous to the filename.
+JSGameEngine.resolveURLToResourceFolder = function(_filename)
+{
+    return 'http://'+ C_SERVER_IP + '/obj/' + _filename; 
 }
  
 // --------------------------------------------------------------- 
@@ -1277,7 +1283,7 @@ JSGameEngine.prototype.fillTriangleCustom = function(	x1, y1, w1, x2, y2, w2, x3
             var ax = x1 + (i - y1) * dax_step;
             var bx = x1 + (i - y1) * dbx_step;
 
-            var tex_sw = w2 + (i - y2) * dw1_step;
+            var tex_sw = w1 + (i - y1) * dw1_step;
             var tex_ew = w1 + (i - y1) * dw2_step;
 
             if (ax > bx)
@@ -1324,7 +1330,7 @@ JSGameEngine.prototype.fillTriangleCustom = function(	x1, y1, w1, x2, y2, w2, x3
             var ax = x2 + (i - y2) * dax_step;
             var bx = x1 + (i - y1) * dbx_step;
 
-            var tex_sw = w1 + (i - y1) * dw1_step;
+            var tex_sw = w2 + (i - y2) * dw1_step;
             var tex_ew = w1 + (i - y1) * dw2_step;
 
             if (ax > bx)
@@ -1577,6 +1583,12 @@ JSGameEngine.graToRad = function(grados)
 JSGameEngine.radToGra = function(radians)
 {
     return 180 * radians / Math.PI;
+}
+
+// Get an URL to the OBJ folder, adding SERVER IP and  PORT previous to the filename.
+JSGameEngine.resolveURLToResourceFolder = function(_filename)
+{
+    return 'http://'+ C_SERVER_IP + '/obj/' + _filename; 
 }
  
 // --------------------------------------------------------------- 
@@ -2562,12 +2574,14 @@ Space.prototype.drawTriangles = function(_listTriangles)
                                       p1.x, p1.y, t1.u, t1.v, t1.w,
                                       p2.x, p2.y, t2.u, t2.v, t2.w, _listTriangles[i].imgDataTexture);
             }
-
-            if (this.renderMode === Space.C_RENDER_MODE_TRIANGLE_FILL)
-                gEngine.fillTriangle(	p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, JSGameEngine.PIXEL_SOLID, _listTriangles[i].faceColorRender);
             else
-                gEngine.fillTriangleCustom(	p0.x, p0.y, p0.w, p1.x, p1.y, p1.w, p2.x, p2.y, p2.w, _listTriangles[i].faceColorRenderRGBA);
-
+            {
+                if (this.renderMode === Space.C_RENDER_MODE_TRIANGLE_FILL)
+                    gEngine.fillTriangle(	p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, JSGameEngine.PIXEL_SOLID, _listTriangles[i].faceColorRender);
+                else
+                    gEngine.fillTriangleCustom(	p0.x, p0.y, p0.w, p1.x, p1.y, p1.w, p2.x, p2.y, p2.w, _listTriangles[i].faceColorRenderRGBA);
+            }
+            
             if (this.linesVisible === true)
                 gEngine.drawTriangle(	p0.x, p0.y, p1.x, p1.y, p2.x, p2.y,	JSGameEngine.PIXEL_SOLID, "gray");
         }
@@ -3500,10 +3514,25 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
     var cacheColorVertexes = new Array();
     var cacheVertexes = new Array();
     var cacheVertexTextures = new Array();
+    var cacheFaces = new Array();
     var splitted = _meshData.split("\n");
+    var materialFile = "";
+    var cacheMaterialsName = new Array();
 
-    for (var i = 0; i < splitted.length - 1; i++) 
+    for (var i = 0; i < splitted.length; i++) 
     {
+           if (splitted[i].substring(0,7) == "mtllib ")
+           {
+               var splittedRow = splitted[i].split(" ");
+               materialFile = splittedRow[1];
+           }
+
+           if (splitted[i].substring(0,7) == "usemtl ")
+           {
+               var splittedRow = splitted[i].split(" ");
+               cacheMaterialsName.push(splittedRow[1]);
+           }
+
            if (splitted[i].substring(0,2) == "v ")
            {
                var splittedRow = splitted[i].split(" ");
@@ -3549,54 +3578,160 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
                var v = 0;
                var vt = 0;
 
-               // Mesh with texture data.
                if (splittedFace[1].split("/").length > 1)
                {
-                   v1 = splittedFace[1].split("/")[0];
-                   vt1 = splittedFace[1].split("/")[1];
-                   v2 = splittedFace[2].split("/")[0];
-                   vt2 = splittedFace[2].split("/")[1];
-                   v3 = splittedFace[3].split("/")[0];
-                   vt3 = splittedFace[3].split("/")[1];
+                   v1 = parseFloat(splittedFace[1].split("/")[0]) - 1;
+                   vt1 = parseFloat(splittedFace[1].split("/")[1]) - 1;
+                   v2 = parseFloat(splittedFace[2].split("/")[0]) - 1;
+                   vt2 = parseFloat(splittedFace[2].split("/")[1]) - 1;
+                   v3 = parseFloat(splittedFace[3].split("/")[0]) - 1;
+                   vt3 = parseFloat(splittedFace[3].split("/")[1]) - 1;
 
-                   var tri = this.createNewTriangleWithPoints(cacheVertexes[parseFloat(v1) - 1],  
-                                                              cacheVertexes[parseFloat(v2) - 1], 
-                                                              cacheVertexes[parseFloat(v3) - 1]);
-
-                   tri.setTexture( new Vector2D(	cacheVertexTextures[parseFloat(vt1) - 1].x, 
-                                                   cacheVertexTextures[parseFloat(vt1) - 1].y, 
-                                                1),
-
-                                   new Vector2D(	cacheVertexTextures[parseFloat(vt2) - 1].x, 
-                                                   cacheVertexTextures[parseFloat(vt2) - 1].y, 
-                                                1),
-
-                                   new Vector2D(	cacheVertexTextures[parseFloat(vt3) - 1].x, 
-                                                   cacheVertexTextures[parseFloat(vt3) - 1].y,
-                                                1));
-                   tri.useTexture = true;
+                   cacheFaces.push({V1: v1, VT1: vt1, V2: v2, VT2: vt2, V3: v3, VT3: vt3, useTexture: true});
                }
                else
                {
-                   var tri = this.createNewTriangleWithPoints(cacheVertexes[parseFloat(splittedFace[1]) - 1],  
-                                                              cacheVertexes[parseFloat(splittedFace[2]) - 1], 
-                                                              cacheVertexes[parseFloat(splittedFace[3]) - 1]);
+                   v1 = parseFloat(splittedFace[1]) - 1;
+                   v2 = parseFloat(splittedFace[2]) - 1;
+                   v3 = parseFloat(splittedFace[3]) - 1;
 
-                   var vertexColor = cacheColorVertexes[parseFloat(splittedFace[1]) - 1];
-                   if (vertexColor !== null && vertexColor.colored === true)
-                   {
-                       tri.faceColor.r = vertexColor.x;
-                       tri.faceColor.g = vertexColor.y;
-                       tri.faceColor.b = vertexColor.z;
-                       tri.faceColor.a = vertexColor.w;
-                   }
+                   cacheFaces.push({V1: v1, VT1: 0, V2: v2, VT2: 0, V3: v3, VT3: 0, useTexture: false});
                }
-
-               this.addTriangle(tri);
            }
     }   
 
+    for (var i = 0; i < cacheFaces.length; i++) 
+    {
+        if (cacheFaces[i].useTexture === true)
+        {
+               v1 = cacheFaces[i].V1;
+               vt1 = cacheFaces[i].VT1;
+               v2 = cacheFaces[i].V2;
+               vt2 = cacheFaces[i].VT2;
+               v3 = cacheFaces[i].V3;
+               vt3 = cacheFaces[i].VT3;
+
+               var tri = this.createNewTriangleWithPoints(cacheVertexes[v1],  
+                                                          cacheVertexes[v2], 
+                                                          cacheVertexes[v3]);
+
+               tri.setTexture( new Vector2D(	cacheVertexTextures[vt1].x, 
+                                               cacheVertexTextures[vt1].y, 
+                                            1),
+
+                               new Vector2D(	cacheVertexTextures[vt2].x, 
+                                               cacheVertexTextures[vt2].y, 
+                                            1),
+
+                               new Vector2D(	cacheVertexTextures[vt3].x, 
+                                               cacheVertexTextures[vt3].y,
+                                            1));
+            
+               tri.useTexture = true;
+        }
+        else
+        {
+            v1 = cacheFaces[i].V1;
+            v2 = cacheFaces[i].V2;
+            v3 = cacheFaces[i].V3;
+
+            var tri = this.createNewTriangleWithPoints(cacheVertexes[v1], cacheVertexes[v2], cacheVertexes[v3]);
+            var vertexColor = cacheColorVertexes[v1];
+            if (vertexColor !== null && vertexColor.colored === true)
+            {
+                tri.faceColor.r = vertexColor.x;
+                tri.faceColor.g = vertexColor.y;
+                tri.faceColor.b = vertexColor.z;
+                tri.faceColor.a = vertexColor.w;
+            }
+        }
+
+        this.addTriangle(tri);
+    }
+
+    if (materialFile !== "" && cacheMaterialsName.length > 0)
+    {
+        this.loadTextureFromMaterialFile(materialFile, cacheMaterialsName);
+    }
+
     console.log("generateMeshFromFileData ",this.fileName, ", triangles count:", this.tris.length);			
+}
+
+Mesh.prototype.loadTextureFromMaterialFile = function(_fileName, _materialNames) 
+{
+    if (C_MOCK_MODE === true)
+    {
+        this.loadTextureFromMaterialFileMock(_fileName, _materialNames);
+    }
+    else
+    {
+        this.loadTextureFromMaterialFileServer(_fileName, _materialNames);
+    }
+}
+
+Mesh.prototype.loadTextureFromMaterialFileMock = function(_fileName, _materialNames) 
+{
+    this.fileName = JSGameEngine.resolveURLToResourceFolder(_fileName).toLowerCase();
+
+    if (mockedObj.has(this.fileName) === true)
+    {
+        var responseText = mockedObj.get(this.fileName);
+        responseText = responseText.replace(/&lf;/g, "\n");
+        this.parseMaterialFile(_fileName, responseText, _materialNames);	            
+    }
+}
+
+Mesh.prototype.loadTextureFromMaterialFileServer = function(_fileName, _materialNames) 
+{
+    var thisClass = this;
+    this.fileName = _fileName;
+
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", _fileName, false);
+    rawFile.onreadystatechange = function ()
+    {
+        var loadedOk = false;
+        var allText = "";
+
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                thisClass.parseMaterialFile(_fileName, rawFile.responseText, _materialNames);
+                loadedOk = true;
+            }
+        }
+    }
+    rawFile.send(null);
+}
+
+Mesh.prototype.parseMaterialFile = function(_fileName, _data, _materialsNames) 
+{
+    var splitted = _data.split("\n");
+
+    // File example
+    // newmtl Mat_0
+    // Kd 1.000000 1.000000 1.000000
+    // map_Kd jario_WithBorder_NoMipMap.png
+
+    for (var i = 0; i < splitted.length; i++) 
+    {
+           if (splitted[i].substring(0,7) == "newmtl ")
+           {
+               var splittedRow = splitted[i].split(" ");
+               materialName = splittedRow[1];
+               i = i + 2;		// Skeep two lines to map_Kd
+
+                if (splitted[i].substring(0,7) == "map_Kd ")
+                {
+                    splittedRow = splitted[i].split(" ");
+                    textureName = splittedRow[1];
+
+                    console.log("loaded texture from material", _fileName, ", texture name:", textureName);			
+                    this.loadTexture(textureName);
+                }							   		
+           }
+    }   
 }
 
 Mesh.prototype.color = function(_r, _g, _b, _a) 
@@ -3829,6 +3964,19 @@ Mesh.prototype.getScale = function()
 
 Mesh.prototype.loadTexture = function(_url) 
 {
+    var url = "";
+
+    if (C_MOCK_MODE === true)
+    {
+        var filename = JSGameEngine.resolveURLToResourceFolder(_url).toLowerCase();
+        url = mockedObj.get(filename); 
+    }
+
+    this.loadTextureFile(url);
+}
+
+Mesh.prototype.loadTextureFile = function(_url) 
+{
     var _this = this;
     this.imgTexture.onload = function () 
     {
@@ -3852,9 +4000,15 @@ Mesh.prototype.loadTexture = function(_url)
             _this.imgDataTexture = newContext.getImageData(0, 0,imgWidth, imgHeight);
         }
     }			
+
+    this.imgTexture.onerror = function(e)
+    {
+        console.log("Error loading image:");
+        console.log(e);
+    }	
+
     this.imgTexture.crossOrigin = "Anonymous";
     this.imgTexture.src = _url;
-
 }
 
 Mesh.prototype.isTextureLoaded = function() 
@@ -4106,7 +4260,7 @@ PieceFactory.prototype.getCURSOR = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/cursorMark.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("cursorMark.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, 1, 0);
     newMesh.setZOrder(9999);
     newMesh.color(255, 255, 0, 1);
@@ -4124,7 +4278,7 @@ PieceFactory.prototype.getBOARD = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/BOARD.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("BOARD.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY() * -1, 0);
 
     piece.mesh = newMesh;
@@ -4139,7 +4293,7 @@ PieceFactory.prototype.getDOOR = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/DOOR.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("DOOR.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4154,7 +4308,7 @@ PieceFactory.prototype.getWINDOW = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/WINDOW.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("WINDOW.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4169,7 +4323,7 @@ PieceFactory.prototype.getSOCLE = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/SOCLE.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("SOCLE.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4185,7 +4339,7 @@ PieceFactory.prototype.getPILAR_TALL = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/PILAR_TALL.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("PILAR_TALL.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4201,7 +4355,7 @@ PieceFactory.prototype.getPILAR_MEDIUM = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/PILAR_MEDIUM.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("PILAR_MEDIUM.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4217,7 +4371,7 @@ PieceFactory.prototype.getPILAR_SMALL = function()
     piece.init(this.getNextPieceId());
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/PILAR_SMALL.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("PILAR_SMALL.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4232,7 +4386,7 @@ PieceFactory.prototype.getRAILING = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/RAILING.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("RAILING.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4247,7 +4401,7 @@ PieceFactory.prototype.getCABRIADA = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/CABRIADA.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("CABRIADA.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4262,7 +4416,7 @@ PieceFactory.prototype.getCABRIADAB = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/CABRIADA.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("CABRIADA.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
     newMesh.setAngleY(JSGameEngine.graToRad(90));
 
@@ -4278,7 +4432,7 @@ PieceFactory.prototype.getROOF = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/ROOF.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("ROOF.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4293,7 +4447,7 @@ PieceFactory.prototype.getROOFB = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/ROOF.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("ROOF.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
     newMesh.setAngleY(JSGameEngine.graToRad(90));
 
@@ -4309,7 +4463,7 @@ PieceFactory.prototype.getFLOOR = function()
     var piece = new Piece();
 
     var newMesh = new Mesh();
-    newMesh.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/FLOOR.obj', this.createShapeFromFile, true);
+    newMesh.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("FLOOR.obj"), this.createShapeFromFile, true);
     newMesh.setPosition(0, newMesh.getHalfY(), 0);
 
     piece.mesh = newMesh;
@@ -4720,12 +4874,12 @@ BluePlane.prototype.createTablero = function(_space)
     this.space.getMeshCollection().push(ground.getMesh());
 
     var pilarBase = new Mesh();
-    pilarBase.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/holeMark.obj', null, true);
+    pilarBase.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("holeMark.obj"), null, true);
     pilarBase.updateCenter();
     pilarBase.center();
  
     var groundBase = new Mesh();
-    groundBase.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/groundMark.obj', null, true);
+    groundBase.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("groundMark.obj"), null, true);
     groundBase.updateCenter();
     groundBase.center();
  
@@ -5168,9 +5322,6 @@ BluePlane.prototype.onlyShowCurrentLayer = function()
 var mockedObj = new Map(); 
 var item = ""; 
  
-item = '# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 0.00 0.00 255 255 0&lf;v 0.00 25.00 0.00 255 255 0&lf;v 30.00 25.00 0.00 255 255 0&lf;v 30.00 0.00 0.00 255 255 0&lf;v 0.00 0.00 2.00 255 255 0&lf;v 0.00 25.00 2.00 255 255 0&lf;v 30.00 25.00 2.00 255 255 0&lf;v 30.00 0.00 2.00 255 255 0&lf;&lf;f 1.00 2.00 3.00&lf;f 1.00 3.00 4.00&lf;f 4.00 3.00 7.00&lf;f 4.00 7.00 8.00&lf;f 8.00 7.00 6.00&lf;f 8.00 6.00 5.00&lf;f 5.00 6.00 2.00&lf;f 5.00 2.00 1.00&lf;f 2.00 6.00 7.00&lf;f 2.00 7.00 3.00&lf;f 8.00 5.00 1.00&lf;f 8.00 1.00 4.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 40.00 0.00 0.00 255 255 0&lf;v 40.00 25.00 0.00 255 255 0&lf;v 70.00 25.00 0.00 255 255 0&lf;v 70.00 0.00 0.00 255 255 0&lf;v 40.00 0.00 2.00 255 255 0&lf;v 40.00 25.00 2.00 255 255 0&lf;v 70.00 25.00 2.00 255 255 0&lf;v 70.00 0.00 2.00 255 255 0&lf;&lf;f 9.00 10.00 11.00&lf;f 9.00 11.00 12.00&lf;f 12.00 11.00 15.00&lf;f 12.00 15.00 16.00&lf;f 16.00 15.00 14.00&lf;f 16.00 14.00 13.00&lf;f 13.00 14.00 10.00&lf;f 13.00 10.00 9.00&lf;f 10.00 14.00 15.00&lf;f 10.00 15.00 11.00&lf;f 16.00 13.00 9.00&lf;f 16.00 9.00 12.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 25.00 0.00 255 255 0&lf;v 35.00 50.00 0.00 255 255 0&lf;v 70.00 25.00 0.00 255 255 0&lf;v 0.00 25.00 2.00 255 255 0&lf;v 35.00 50.00 2.00 255 255 0&lf;v 70.00 25.00 2.00 255 255 0&lf;&lf;f 17.00 18.00 19.00&lf;f 20.00 22.00 21.00&lf;f 19.00 18.00 21.00&lf;f 19.00 21.00 22.00&lf;f 20.00 21.00 18.00&lf;f 20.00 18.00 17.00&lf;f 17.00 20.00 21.00&lf;f 17.00 22.00 19.00&lf;&lf;&lf;';
-mockedObj.set('http://127.0.0.1:8080/obj/CABRIADA.obj'.toLowerCase(), item); 
- 
 item = '# Exported from Motor3dJS&lf;o Object.1&lf;v 0.00 0.00 0.00 10 10 255&lf;v 0.00 15.00 0.00 10 10 255&lf;v 15.00 15.00 0.00 10 10 255&lf;v 15.00 0.00 0.00 10 10 255&lf;v 0.00 0.00 15.00 10 10 255&lf;v 0.00 15.00 15.00 10 10 255&lf;v 15.00 15.00 15.00 10 10 255&lf;v 15.00 0.00 15.00 10 10 255&lf;&lf;f 2 6 7&lf;f 2 7 3&lf;&lf;&lf;&lf;&lf;';
 mockedObj.set('http://127.0.0.1:8080/obj/cursorMark.obj'.toLowerCase(), item); 
  
@@ -5192,7 +5343,7 @@ mockedObj.set('http://127.0.0.1:8080/obj/PILAR_TALL.obj'.toLowerCase(), item);
 item = 'multiCubeDataParameter&lf;(&lf;[&lf;"0, 0,0,0, 10,107|,10, 185 153 118"&lf;]&lf;);&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 0.00 0.00 185 153 118&lf;v 0.00 107.00 0.00 185 153 118&lf;v 10.00 107.00 0.00 185 153 118&lf;v 10.00 0.00 0.00 185 153 118&lf;v 0.00 0.00 10.00 185 153 118&lf;v 0.00 107.00 10.00 185 153 118&lf;v 10.00 107.00 10.00 185 153 118&lf;v 10.00 0.00 10.00 185 153 118&lf;&lf;f 1.00 2.00 3.00&lf;f 1.00 3.00 4.00&lf;f 4.00 3.00 7.00&lf;f 4.00 7.00 8.00&lf;f 8.00 7.00 6.00&lf;f 8.00 6.00 5.00&lf;f 5.00 6.00 2.00&lf;f 5.00 2.00 1.00&lf;f 2.00 6.00 7.00&lf;f 2.00 7.00 3.00&lf;f 8.00 5.00 1.00&lf;f 8.00 1.00 4.00&lf;';
 mockedObj.set('http://127.0.0.1:8080/obj/PILAR_MEDIUM.obj'.toLowerCase(), item); 
  
-item = 'multiCubeDataParameter&lf;(&lf;[&lf;"0, 0,0,0, 10,25,10, 185 153 118"&lf;]&lf;);&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 0.00 0.00 185 153 118&lf;v 0.00 27.00 0.00 185 153 118&lf;v 10.00 27.00 0.00 185 153 118&lf;v 10.00 0.00 0.00 185 153 118&lf;v 0.00 0.00 10.00 185 153 118&lf;v 0.00 27.00 10.00 185 153 118&lf;v 10.00 27.00 10.00 185 153 118&lf;v 10.00 0.00 10.00 185 153 118&lf;&lf;f 1.00 2.00 3.00&lf;f 1.00 3.00 4.00&lf;f 4.00 3.00 7.00&lf;f 4.00 7.00 8.00&lf;f 8.00 7.00 6.00&lf;f 8.00 6.00 5.00&lf;f 5.00 6.00 2.00&lf;f 5.00 2.00 1.00&lf;f 2.00 6.00 7.00&lf;f 2.00 7.00 3.00&lf;f 8.00 5.00 1.00&lf;f 8.00 1.00 4.00&lf;';
+item = '# Exported from 3D Builder&lf;mtllib PILAR_SMALL.mtl&lf;&lf;o Object.1&lf;v 0.000000 0.000000 0.000000&lf;v 0.000000 27.000000 0.000000&lf;v 10.000000 27.000000 0.000000&lf;v 10.000000 0.000000 0.000000&lf;v 10.000000 27.000000 10.000000&lf;v 10.000000 0.000000 10.000000&lf;v 0.000000 27.000000 10.000000&lf;v 0.000000 0.000000 10.000000&lf;&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 6/1 5/4 7/2&lf;f 6/1 7/2 8/3&lf;&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 0.000000&lf;&lf;usemtl Mat_0&lf;f 6/5 1/7 4/8&lf;f 6/5 8/6 1/7&lf;&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 1.000000 0.000000&lf;&lf;usemtl Mat_0&lf;f 4/9 5/10 6/11&lf;f 4/9 3/12 5/10&lf;&lf;vt 1.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 8/13 7/16 2/14&lf;f 8/13 2/14 1/15&lf;&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 1/17 2/20 3/18&lf;f 1/17 3/18 4/19&lf;&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 2/21 7/24 5/22&lf;f 2/21 5/22 3/23&lf;&lf;';
 mockedObj.set('http://127.0.0.1:8080/obj/PILAR_SMALL.obj'.toLowerCase(), item); 
  
 item = '&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 0.00 0.00 200 0 0&lf;v 0.00 2.00 0.00 200 0 0&lf;v 45.00 33.00 0.00 200 0 0&lf;v 45.00 31.00 0.00 200 0 0&lf;v 0.00 0.00 40.00 200 0 0&lf;v 0.00 2.00 40.00 200 0 0&lf;v 45.00 33.00 40.00 200 0 0&lf;v 45.00 31.00 40.00 200 0 0&lf;&lf;f 1.00 2.00 3.00&lf;f 1.00 3.00 4.00&lf;f 4.00 3.00 7.00&lf;f 4.00 7.00 8.00&lf;f 8.00 7.00 6.00&lf;f 8.00 6.00 5.00&lf;f 5.00 6.00 2.00&lf;f 5.00 2.00 1.00&lf;f 2.00 6.00 7.00&lf;f 2.00 7.00 3.00&lf;f 8.00 5.00 1.00&lf;f 8.00 1.00 4.00&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 45.00 31.00 0.00 200 0 0&lf;v 45.00 33.00 0.00 200 0 0&lf;v 90.00 2.00 0.00 200 0 0&lf;v 90.00 0.00 0.00 200 0 0&lf;v 45.00 31.00 40.00 200 0 0&lf;v 45.00 33.00 40.00 200 0 0&lf;v 90.00 2.00 40.00 200 0 0&lf;v 90.00 0.00 40.00 200 0 0&lf;&lf;f 9.00 10.00 11.00&lf;f 9.00 11.00 12.00&lf;f 12.00 11.00 15.00&lf;f 12.00 15.00 16.00&lf;f 16.00 15.00 14.00&lf;f 16.00 14.00 14.00&lf;f 13.00 14.00 10.00&lf;f 13.00 10.00 9.00&lf;f 10.00 14.00 15.00&lf;f 10.00 15.00 11.00&lf;f 16.00 13.00 9.00&lf;f 16.00 9.00 12.00&lf;';
@@ -5204,7 +5355,7 @@ mockedObj.set('http://127.0.0.1:8080/obj/BOARD.obj'.toLowerCase(), item);
 item = 'multiCubeDataParameter&lf;(&lf;[&lf;"0, 0,0,0, 30,5,2, 20 20 128 255",&lf;"8, 0,70,0, 30,10,2, 20 20 128 255",&lf;"16, 0,5,0, 5,65,2, 20 20 128 255",&lf;"24, 25,5,0, 5,65,2, 20 20 128 255"&lf;]&lf;);&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 0.00 0.00 20 20 128 255&lf;v 0.00 5.00 0.00 20 20 128 255&lf;v 30.00 5.00 0.00 20 20 128 255&lf;v 30.00 0.00 0.00 20 20 128 255&lf;v 0.00 0.00 2.00 20 20 128 255&lf;v 0.00 5.00 2.00 20 20 128 255&lf;v 30.00 5.00 2.00 20 20 128 255&lf;v 30.00 0.00 2.00 20 20 128 255&lf;&lf;f 1.00 2.00 3.00&lf;f 1.00 3.00 4.00&lf;f 4.00 3.00 7.00&lf;f 4.00 7.00 8.00&lf;f 8.00 7.00 6.00&lf;f 8.00 6.00 5.00&lf;f 5.00 6.00 2.00&lf;f 5.00 2.00 1.00&lf;f 2.00 6.00 7.00&lf;f 2.00 7.00 3.00&lf;f 8.00 5.00 1.00&lf;f 8.00 1.00 4.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 70.00 0.00 20 20 128 255&lf;v 0.00 80.00 0.00 20 20 128 255&lf;v 30.00 80.00 0.00 20 20 128 255&lf;v 30.00 70.00 0.00 20 20 128 255&lf;v 0.00 70.00 2.00 20 20 128 255&lf;v 0.00 80.00 2.00 20 20 128 255&lf;v 30.00 80.00 2.00 20 20 128 255&lf;v 30.00 70.00 2.00 20 20 128 255&lf;&lf;f 9.00 10.00 11.00&lf;f 9.00 11.00 12.00&lf;f 12.00 11.00 15.00&lf;f 12.00 15.00 16.00&lf;f 16.00 15.00 14.00&lf;f 16.00 14.00 13.00&lf;f 13.00 14.00 10.00&lf;f 13.00 10.00 9.00&lf;f 10.00 14.00 15.00&lf;f 10.00 15.00 11.00&lf;f 16.00 13.00 9.00&lf;f 16.00 9.00 12.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 5.00 0.00 20 20 128 255&lf;v 0.00 70.00 0.00 20 20 128 255&lf;v 5.00 70.00 0.00 20 20 128 255&lf;v 5.00 5.00 0.00 20 20 128 255&lf;v 0.00 5.00 2.00 20 20 128 255&lf;v 0.00 70.00 2.00 20 20 128 255&lf;v 5.00 70.00 2.00 20 20 128 255&lf;v 5.00 5.00 2.00 20 20 128 255&lf;&lf;f 17.00 18.00 19.00&lf;f 17.00 19.00 20.00&lf;f 20.00 19.00 23.00&lf;f 20.00 23.00 24.00&lf;f 24.00 23.00 22.00&lf;f 24.00 22.00 21.00&lf;f 21.00 22.00 18.00&lf;f 21.00 18.00 17.00&lf;f 18.00 22.00 23.00&lf;f 18.00 23.00 19.00&lf;f 24.00 21.00 17.00&lf;f 24.00 17.00 20.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 25.00 5.00 0.00 20 20 128 255&lf;v 25.00 70.00 0.00 20 20 128 255&lf;v 30.00 70.00 0.00 20 20 128 255&lf;v 30.00 5.00 0.00 20 20 128 255&lf;v 25.00 5.00 2.00 20 20 128 255&lf;v 25.00 70.00 2.00 20 20 128 255&lf;v 30.00 70.00 2.00 20 20 128 255&lf;v 30.00 5.00 2.00 20 20 128 255&lf;&lf;f 25.00 26.00 27.00&lf;f 25.00 27.00 28.00&lf;f 28.00 27.00 31.00&lf;f 28.00 31.00 32.00&lf;f 32.00 31.00 30.00&lf;f 32.00 30.00 29.00&lf;f 29.00 30.00 26.00&lf;f 29.00 26.00 25.00&lf;f 26.00 30.00 31.00&lf;f 26.00 31.00 27.00&lf;f 32.00 29.00 25.00&lf;f 32.00 25.00 28.00&lf;';
 mockedObj.set('http://127.0.0.1:8080/obj/DOOR.obj'.toLowerCase(), item); 
  
-item = 'multiCubeDataParameter&lf;(&lf;[&lf;"0, 0,0,0, 30,5,2, 20 128 20",&lf;"8, 0,50,0, 30,10,2, 20 128 20",&lf;"16, 0,5,0, 5,45,2, 20 128 20",&lf;"24, 25,5,0, 5,45,2, 20 128 20",&lf;"32, 12.5,5,0, 5,45,2, 20 128 20",&lf;"40, 5,27.5,0, 20,5,2, 20 128 20"&lf;]&lf;);&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 0.00 0.00 20 128 20&lf;v 0.00 5.00 0.00 20 128 20&lf;v 30.00 5.00 0.00 20 128 20&lf;v 30.00 0.00 0.00 20 128 20&lf;v 0.00 0.00 2.00 20 128 20&lf;v 0.00 5.00 2.00 20 128 20&lf;v 30.00 5.00 2.00 20 128 20&lf;v 30.00 0.00 2.00 20 128 20&lf;&lf;f 1.00 2.00 3.00&lf;f 1.00 3.00 4.00&lf;f 4.00 3.00 7.00&lf;f 4.00 7.00 8.00&lf;f 8.00 7.00 6.00&lf;f 8.00 6.00 5.00&lf;f 5.00 6.00 2.00&lf;f 5.00 2.00 1.00&lf;f 2.00 6.00 7.00&lf;f 2.00 7.00 3.00&lf;f 8.00 5.00 1.00&lf;f 8.00 1.00 4.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 50.00 0.00 20 128 20&lf;v 0.00 60.00 0.00 20 128 20&lf;v 30.00 60.00 0.00 20 128 20&lf;v 30.00 50.00 0.00 20 128 20&lf;v 0.00 50.00 2.00 20 128 20&lf;v 0.00 60.00 2.00 20 128 20&lf;v 30.00 60.00 2.00 20 128 20&lf;v 30.00 50.00 2.00 20 128 20&lf;&lf;f 9.00 10.00 11.00&lf;f 9.00 11.00 12.00&lf;f 12.00 11.00 15.00&lf;f 12.00 15.00 16.00&lf;f 16.00 15.00 14.00&lf;f 16.00 14.00 13.00&lf;f 13.00 14.00 10.00&lf;f 13.00 10.00 9.00&lf;f 10.00 14.00 15.00&lf;f 10.00 15.00 11.00&lf;f 16.00 13.00 9.00&lf;f 16.00 9.00 12.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 5.00 0.00 20 128 20&lf;v 0.00 50.00 0.00 20 128 20&lf;v 5.00 50.00 0.00 20 128 20&lf;v 5.00 5.00 0.00 20 128 20&lf;v 0.00 5.00 2.00 20 128 20&lf;v 0.00 50.00 2.00 20 128 20&lf;v 5.00 50.00 2.00 20 128 20&lf;v 5.00 5.00 2.00 20 128 20&lf;&lf;f 17.00 18.00 19.00&lf;f 17.00 19.00 20.00&lf;f 20.00 19.00 23.00&lf;f 20.00 23.00 24.00&lf;f 24.00 23.00 22.00&lf;f 24.00 22.00 21.00&lf;f 21.00 22.00 18.00&lf;f 21.00 18.00 17.00&lf;f 18.00 22.00 23.00&lf;f 18.00 23.00 19.00&lf;f 24.00 21.00 17.00&lf;f 24.00 17.00 20.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 25.00 5.00 0.00 20 128 20&lf;v 25.00 50.00 0.00 20 128 20&lf;v 30.00 50.00 0.00 20 128 20&lf;v 30.00 5.00 0.00 20 128 20&lf;v 25.00 5.00 2.00 20 128 20&lf;v 25.00 50.00 2.00 20 128 20&lf;v 30.00 50.00 2.00 20 128 20&lf;v 30.00 5.00 2.00 20 128 20&lf;&lf;f 25.00 26.00 27.00&lf;f 25.00 27.00 28.00&lf;f 28.00 27.00 31.00&lf;f 28.00 31.00 32.00&lf;f 32.00 31.00 30.00&lf;f 32.00 30.00 29.00&lf;f 29.00 30.00 26.00&lf;f 29.00 26.00 25.00&lf;f 26.00 30.00 31.00&lf;f 26.00 31.00 27.00&lf;f 32.00 29.00 25.00&lf;f 32.00 25.00 28.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 12.50 5.00 0.00 20 128 20&lf;v 12.50 50.00 0.00 20 128 20&lf;v 17.50 50.00 0.00 20 128 20&lf;v 17.50 5.00 0.00 20 128 20&lf;v 12.50 5.00 2.00 20 128 20&lf;v 12.50 50.00 2.00 20 128 20&lf;v 17.50 50.00 2.00 20 128 20&lf;v 17.50 5.00 2.00 20 128 20&lf;&lf;f 33.00 34.00 35.00&lf;f 33.00 35.00 36.00&lf;f 36.00 35.00 39.00&lf;f 36.00 39.00 40.00&lf;f 40.00 39.00 38.00&lf;f 40.00 38.00 37.00&lf;f 37.00 38.00 34.00&lf;f 37.00 34.00 33.00&lf;f 34.00 38.00 39.00&lf;f 34.00 39.00 35.00&lf;f 40.00 37.00 33.00&lf;f 40.00 33.00 36.00&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 5.00 27.50 0.00 20 128 20&lf;v 5.00 32.50 0.00 20 128 20&lf;v 25.00 32.50 0.00 20 128 20&lf;v 25.00 27.50 0.00 20 128 20&lf;v 5.00 27.50 2.00 20 128 20&lf;v 5.00 32.50 2.00 20 128 20&lf;v 25.00 32.50 2.00 20 128 20&lf;v 25.00 27.50 2.00 20 128 20&lf;&lf;f 41.00 42.00 43.00&lf;f 41.00 43.00 44.00&lf;f 44.00 43.00 47.00&lf;f 44.00 47.00 48.00&lf;f 48.00 47.00 46.00&lf;f 48.00 46.00 45.00&lf;f 45.00 46.00 42.00&lf;f 45.00 42.00 41.00&lf;f 42.00 46.00 47.00&lf;f 42.00 47.00 43.00&lf;f 48.00 45.00 41.00&lf;f 48.00 41.00 44.00&lf;';
+item = 'multiCubeDataParameter&lf;(&lf;[&lf;"0, 0,0,0, 30,5,2, 20 128 20",&lf;"8, 0,50,0, 30,10,2, 20 128 20",&lf;"16, 0,5,0, 5,45,2, 20 128 20",&lf;"24, 25,5,0, 5,45,2, 20 128 20",&lf;"32, 12.5,5,0, 5,45,2, 20 128 20",&lf;"40, 5,27.5,0, 20,5,2, 20 128 20"&lf;]&lf;);&lf;&lf;&lf;# Exported from 3D Builder&lf;mtllib WINDOW.mtl&lf;&lf;o Object.1&lf;v 0.000000 0.000000 0.000000 20 128 20&lf;v 30.000000 5.000000 0.000000 20 128 20&lf;v 30.000000 0.000000 0.000000 20 128 20&lf;v 30.000000 0.000000 2.000000 20 128 20&lf;v 0.000000 0.000000 2.000000 20 128 20&lf;v 0.000000 5.000000 2.000000 20 128 20&lf;v 30.000000 5.000000 2.000000 20 128 20&lf;v 0.000000 5.000000 0.000000 20 128 20&lf;&lf;v 0.000000 5.000000 0.000000 20 128 20&lf;v 0.000000 5.000000 2.000000 20 128 20&lf;v 30.000000 5.000000 2.000000 20 128 20&lf;v 30.000000 0.000000 0.000000 20 128 20&lf;v 30.000000 5.000000 2.000000 20 128 20&lf;v 0.000000 5.000000 0.000000 20 128 20&lf;v 30.000000 5.000000 2.000000 20 128 20&lf;v 30.000000 5.000000 0.000000 20 128 20&lf;v 0.000000 0.000000 2.000000 20 128 20&lf;v 0.000000 5.000000 0.000000 20 128 20&lf;&lf;f 3 7 4&lf;f 5 6 8&lf;f 9 10 11&lf;f 12 2 13&lf;f 14 15 16&lf;f 17 18 1&lf;&lf;vt 1.000000 -0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 -0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 4/5 1/6 3/7&lf;f 4/1 7/2 6/3&lf;f 4/1 6/3 5/4&lf;f 4/5 5/8 1/6&lf;&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 1/9 8/12 2/10&lf;f 1/9 2/10 3/11&lf;&lf;&lf;o Object.2&lf;v 0.000000 50.000000 0.000000 20 128 20&lf;v 30.000000 60.000000 0.000000 20 128 20&lf;v 30.000000 50.000000 0.000000 20 128 20&lf;v 30.000000 50.000000 2.000000 20 128 20&lf;v 0.000000 50.000000 2.000000 20 128 20&lf;v 0.000000 60.000000 2.000000 20 128 20&lf;v 30.000000 60.000000 2.000000 20 128 20&lf;v 0.000000 60.000000 0.000000 20 128 20&lf;&lf;v 0.000000 60.000000 0.000000 20 128 20&lf;v 0.000000 60.000000 2.000000 20 128 20&lf;v 30.000000 60.000000 2.000000 20 128 20&lf;v 30.000000 50.000000 0.000000 20 128 20&lf;v 30.000000 60.000000 2.000000 20 128 20&lf;v 0.000000 60.000000 0.000000 20 128 20&lf;v 30.000000 60.000000 2.000000 20 128 20&lf;v 30.000000 60.000000 0.000000 20 128 20&lf;v 0.000000 50.000000 2.000000 20 128 20&lf;v 0.000000 60.000000 0.000000 20 128 20&lf;&lf;f 21 25 22&lf;f 23 24 26&lf;f 27 28 29&lf;f 30 20 31&lf;f 32 33 34&lf;f 35 36 19&lf;&lf;vt 1.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 22/17 19/18 21/19&lf;f 22/13 25/14 24/15&lf;f 22/13 24/15 23/16&lf;f 22/17 23/20 19/18&lf;&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 19/21 26/24 20/22&lf;f 19/21 20/22 21/23&lf;&lf;&lf;o Object.3&lf;v 5.000000 50.000000 0.000000 20 128 20&lf;v 5.000000 5.000000 0.000000 20 128 20&lf;v 5.000000 5.000000 2.000000 20 128 20&lf;v 0.000000 5.000000 2.000000 20 128 20&lf;v 0.000000 50.000000 2.000000 20 128 20&lf;v 5.000000 50.000000 2.000000 20 128 20&lf;v 0.000000 50.000000 0.000000 20 128 20&lf;v 0.000000 5.000000 0.000000 20 128 20&lf;&lf;v 5.000000 5.000000 0.000000 20 128 20&lf;v 5.000000 5.000000 2.000000 20 128 20&lf;v 0.000000 50.000000 0.000000 20 128 20&lf;v 0.000000 50.000000 2.000000 20 128 20&lf;v 5.000000 50.000000 2.000000 20 128 20&lf;v 5.000000 5.000000 2.000000 20 128 20&lf;v 0.000000 5.000000 2.000000 20 128 20&lf;v 0.000000 5.000000 0.000000 20 128 20&lf;v 5.000000 5.000000 0.000000 20 128 20&lf;v 5.000000 50.000000 2.000000 20 128 20&lf;v 0.000000 50.000000 0.000000 20 128 20&lf;v 5.000000 50.000000 2.000000 20 128 20&lf;v 5.000000 50.000000 0.000000 20 128 20&lf;v 0.000000 5.000000 2.000000 20 128 20&lf;v 0.000000 50.000000 0.000000 20 128 20&lf;v 0.000000 5.000000 0.000000 20 128 20&lf;&lf;f 39 44 38&lf;f 45 42 46&lf;f 40 41 43&lf;f 47 48 49&lf;f 50 51 52&lf;f 53 37 54&lf;f 55 56 57&lf;f 58 59 60&lf;&lf;vt 1.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;&lf;usemtl Mat_0&lf;f 39/25 42/26 41/27&lf;f 39/25 41/27 40/28&lf;&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 44/29 43/32 37/30&lf;f 44/29 37/30 38/31&lf;&lf;&lf;o Object.4&lf;v 30.000000 50.000000 0.000000 20 128 20&lf;v 30.000000 5.000000 0.000000 20 128 20&lf;v 30.000000 5.000000 2.000000 20 128 20&lf;v 25.000000 5.000000 2.000000 20 128 20&lf;v 25.000000 50.000000 2.000000 20 128 20&lf;v 30.000000 50.000000 2.000000 20 128 20&lf;v 25.000000 50.000000 0.000000 20 128 20&lf;v 25.000000 5.000000 0.000000 20 128 20&lf;&lf;v 30.000000 5.000000 0.000000 20 128 20&lf;v 30.000000 5.000000 2.000000 20 128 20&lf;v 25.000000 50.000000 0.000000 20 128 20&lf;v 25.000000 50.000000 2.000000 20 128 20&lf;v 30.000000 50.000000 2.000000 20 128 20&lf;v 30.000000 5.000000 2.000000 20 128 20&lf;v 25.000000 5.000000 2.000000 20 128 20&lf;v 25.000000 5.000000 0.000000 20 128 20&lf;v 30.000000 5.000000 0.000000 20 128 20&lf;v 30.000000 50.000000 2.000000 20 128 20&lf;v 25.000000 50.000000 0.000000 20 128 20&lf;v 30.000000 50.000000 2.000000 20 128 20&lf;v 30.000000 50.000000 0.000000 20 128 20&lf;v 25.000000 5.000000 2.000000 20 128 20&lf;v 25.000000 50.000000 0.000000 20 128 20&lf;v 25.000000 5.000000 0.000000 20 128 20&lf;&lf;f 63 68 62&lf;f 69 66 70&lf;f 64 65 67&lf;f 71 72 73&lf;f 74 75 76&lf;f 77 61 78&lf;f 79 80 81&lf;f 82 83 84&lf;&lf;vt 1.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;&lf;usemtl Mat_0&lf;f 63/33 66/34 65/35&lf;f 63/33 65/35 64/36&lf;&lf;vt 1.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;&lf;usemtl Mat_0&lf;f 68/37 67/38 61/39&lf;f 68/37 61/39 62/40&lf;&lf;&lf;o Object.5&lf;v 17.500000 50.000000 0.000000 20 128 20&lf;v 17.500000 5.000000 0.000000 20 128 20&lf;v 17.500000 5.000000 2.000000 20 128 20&lf;v 12.500000 5.000000 2.000000 20 128 20&lf;v 12.500000 50.000000 2.000000 20 128 20&lf;v 17.500000 50.000000 2.000000 20 128 20&lf;v 12.500000 50.000000 0.000000 20 128 20&lf;v 12.500000 5.000000 0.000000 20 128 20&lf;&lf;v 17.500000 5.000000 0.000000 20 128 20&lf;v 17.500000 5.000000 2.000000 20 128 20&lf;v 12.500000 50.000000 0.000000 20 128 20&lf;v 12.500000 50.000000 2.000000 20 128 20&lf;v 17.500000 50.000000 2.000000 20 128 20&lf;v 17.500000 5.000000 2.000000 20 128 20&lf;v 12.500000 5.000000 2.000000 20 128 20&lf;v 12.500000 5.000000 0.000000 20 128 20&lf;v 17.500000 5.000000 0.000000 20 128 20&lf;v 17.500000 50.000000 2.000000 20 128 20&lf;v 12.500000 50.000000 0.000000 20 128 20&lf;v 17.500000 50.000000 2.000000 20 128 20&lf;v 17.500000 50.000000 0.000000 20 128 20&lf;v 12.500000 5.000000 2.000000 20 128 20&lf;v 12.500000 50.000000 0.000000 20 128 20&lf;v 12.500000 5.000000 0.000000 20 128 20&lf;&lf;f 87 92 86&lf;f 93 90 94&lf;f 88 89 91&lf;f 95 96 97&lf;f 98 99 100&lf;f 101 85 102&lf;f 103 104 105&lf;f 106 107 108&lf;&lf;vt 1.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;&lf;usemtl Mat_0&lf;f 87/41 90/42 89/43&lf;f 87/41 89/43 88/44&lf;&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 92/45 91/48 85/46&lf;f 92/45 85/46 86/47&lf;&lf;&lf;o Object.6&lf;v 5.000000 27.500000 0.000000 20 128 20&lf;v 25.000000 32.500000 0.000000 20 128 20&lf;v 25.000000 27.500000 0.000000 20 128 20&lf;v 25.000000 27.500000 2.000000 20 128 20&lf;v 5.000000 27.500000 2.000000 20 128 20&lf;v 5.000000 32.500000 2.000000 20 128 20&lf;v 25.000000 32.500000 2.000000 20 128 20&lf;v 5.000000 32.500000 0.000000 20 128 20&lf;&lf;v 5.000000 27.500000 0.000000 20 128 20&lf;v 25.000000 32.500000 0.000000 20 128 20&lf;v 25.000000 27.500000 0.000000 20 128 20&lf;v 5.000000 32.500000 0.000000 20 128 20&lf;v 5.000000 32.500000 0.000000 20 128 20&lf;v 5.000000 32.500000 2.000000 20 128 20&lf;v 25.000000 32.500000 2.000000 20 128 20&lf;v 25.000000 27.500000 0.000000 20 128 20&lf;v 25.000000 32.500000 0.000000 20 128 20&lf;v 25.000000 32.500000 2.000000 20 128 20&lf;v 5.000000 32.500000 0.000000 20 128 20&lf;v 25.000000 32.500000 2.000000 20 128 20&lf;v 25.000000 32.500000 0.000000 20 128 20&lf;v 5.000000 27.500000 2.000000 20 128 20&lf;v 5.000000 32.500000 0.000000 20 128 20&lf;v 5.000000 27.500000 0.000000 20 128 20&lf;&lf;f 109 116 110&lf;f 117 118 111&lf;f 119 115 112&lf;f 113 114 120&lf;f 121 122 123&lf;f 124 125 126&lf;f 127 128 129&lf;f 130 131 132&lf;&lf;vt 1.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 1.000000&lf;vt 0.000000 0.000000&lf;vt 1.000000 0.000000&lf;vt 0.000000 1.000000&lf;&lf;usemtl Mat_0&lf;f 112/53 109/54 111/55&lf;f 112/49 115/50 114/51&lf;f 112/49 114/51 113/52&lf;f 112/53 113/56 109/54&lf;&lf;';
 mockedObj.set('http://127.0.0.1:8080/obj/WINDOW.obj'.toLowerCase(), item); 
  
 item = 'multiCubeDataParameter&lf;(&lf;[&lf;"0, 0,0,0, 40,2,40, 200 200 200 200"&lf;]&lf;);&lf;&lf;&lf;# Exported from Motor3dJS&lf;o Object.1&lf;&lf;v 0.00 0.00 0.00 200 200 200 200&lf;v 0.00 2.00 0.00 200 200 200 200&lf;v 40.00 2.00 0.00 200 200 200 200&lf;v 40.00 0.00 0.00 200 200 200 200&lf;v 0.00 0.00 40.00 200 200 200 200&lf;v 0.00 2.00 40.00 200 200 200 200&lf;v 40.00 2.00 40.00 200 200 200 200&lf;v 40.00 0.00 40.00 200 200 200 200&lf;&lf;f 1.00 2.00 3.00&lf;f 1.00 3.00 4.00&lf;f 4.00 3.00 7.00&lf;f 4.00 7.00 8.00&lf;f 8.00 7.00 6.00&lf;f 8.00 6.00 5.00&lf;f 5.00 6.00 2.00&lf;f 5.00 2.00 1.00&lf;f 2.00 6.00 7.00&lf;f 2.00 7.00 3.00&lf;f 8.00 5.00 1.00&lf;f 8.00 1.00 4.00&lf;';
@@ -5214,7 +5365,19 @@ item = 'multiCubeDataParameter&lf;(&lf;[&lf;"0, 0,0,0, 30,20,2, 255 20 20"&lf;]&
 mockedObj.set('http://127.0.0.1:8080/obj/SOCLE.obj'.toLowerCase(), item); 
  
 item = '{&lf;   "BoardColumns": 11,&lf;   "BoardRows": 7,&lf;   "BoardId": 100,&lf;   "Layers": [&lf;      {&lf;         "layerNro": 1,&lf;         "pieceMatrix": [&lf;            [&lf;               1,&lf;               -1,&lf;               6,&lf;               -1,&lf;               6,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               1,&lf;               -1,&lf;               6,&lf;               -1,&lf;               6,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               1,&lf;               -1,&lf;               6,&lf;               -1,&lf;               6,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ]&lf;         ]&lf;      },&lf;      {&lf;         "layerNro": 2,&lf;         "pieceMatrix": [&lf;            [&lf;               -1,&lf;               2,&lf;               -1,&lf;               3,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               2,&lf;               -1,&lf;               5,&lf;               -1,&lf;               3,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               2,&lf;               -1,&lf;               3,&lf;               -1,&lf;               3,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               2,&lf;               -1,&lf;               3,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ]&lf;         ]&lf;      },&lf;      {&lf;         "layerNro": 3,&lf;         "pieceMatrix": [&lf;            [&lf;               -1,&lf;               -1,&lf;               8,&lf;               4,&lf;               8,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               4,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               8,&lf;               -1,&lf;               8,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               4,&lf;               -1,&lf;               4,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               8,&lf;               4,&lf;               8,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ]&lf;         ]&lf;      },&lf;      {&lf;         "layerNro": 4,&lf;         "pieceMatrix": [&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               91,&lf;               -1,&lf;               91,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ]&lf;         ]&lf;      },&lf;      {&lf;         "layerNro": 5,&lf;         "pieceMatrix": [&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               11,&lf;               -1,&lf;               11,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ],&lf;            [&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1,&lf;               -1&lf;            ]&lf;         ]&lf;      }&lf;   ]&lf;}&lf;';
-mockedObj.set('http://127.0.0.1:8080/obj/house.bpl'.toLowerCase(), item); 
+mockedObj.set('http://127.0.0.1:8080/obj/HOUSE.bpl'.toLowerCase(), item); 
+ 
+item = '# Exported from 3D Builder&lf;&lf;newmtl Mat_0&lf;Kd 1.000000 1.000000 1.000000&lf;map_Kd window.jpg&lf;';
+mockedObj.set('http://127.0.0.1:8080/obj/WINDOW.mtl'.toLowerCase(), item); 
+ 
+item = 'data:image/jpeg;base64,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';
+mockedObj.set('http://127.0.0.1:8080/obj/window.jpg'.toLowerCase(), item); 
+ 
+item = '# Exported from 3D Builder&lf;&lf;newmtl Mat_0&lf;Kd 1.000000 1.000000 1.000000&lf;map_Kd oak.jpg&lf;';
+mockedObj.set('http://127.0.0.1:8080/obj/PILAR_SMALL.mtl'.toLowerCase(), item); 
+ 
+item = 'data:image/jpeg;base64,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';
+mockedObj.set('http://127.0.0.1:8080/obj/oak.jpg'.toLowerCase(), item); 
  
  
 // --------------------------------------------------------------- 
@@ -5224,7 +5387,7 @@ mockedObj.set('http://127.0.0.1:8080/obj/house.bpl'.toLowerCase(), item);
 // Entry point to the aplication, main loop, inputs controlle, core
 //
 
-var C_VERSION_TITLE = "Little constructor (based on JSEngine) v1.2";
+var C_VERSION_TITLE = "Little constructor (based on JSEngine) v1.3";
 var gEngine = null; 
 var C_SERVER_IP = "127.0.0.1:8080";
 
@@ -5240,6 +5403,8 @@ var C_MOCK_MODE = true;
 function load() 
 {
     console.log(C_VERSION_TITLE);
+    console.log("MOCK_MODE:", C_MOCK_MODE);
+
     document.title = C_VERSION_TITLE;
 
     gEngine = new JSGameEngine(document.getElementById("cv")); 
@@ -5263,12 +5428,24 @@ var defaultOffY = 0;
 var defaultOffZ = 0;
 var defaultIndex = 0;
 
+/* For test Three.js
+var meshes = new Array();
+var piece = null;
+*/
+
 function onUserCreate() 
 {
     console.log("User create");
 
     gEngine.showTimes(false);
-   
+
+    /* For test Three.js
+    var meshes = new Array();
+    piece = PieceFactory.getInstance().createPiece(PieceFactory.WINDOW);
+    meshes.push(piece.mesh);
+    spacePreview.setMeshCollection(meshes);
+    */
+    
     // Space preview.
     spacePreview.setViewSize(800, 340);
     spacePreview.setViewOffset(0, 0);
@@ -5285,7 +5462,12 @@ function onUserCreate()
     spacePreview.addCameraZoom(1.4);
     spacePreview.updateIsometricCamera(spacePreview.cameraXaw, spacePreview.cameraYaw);
     bluePlane.setSpace(spacePreview);
-  
+    
+    /* For test Three.js
+    //bluePlane.setSpace(spacePreview);
+    spacePreview.setMeshCollection(meshes);
+    */
+    
     // Space wired and top.
     spaceWired.setViewSize(800, 240);
     spaceWired.setViewOffset(0, 350);
@@ -5302,6 +5484,12 @@ function onUserCreate()
     spaceWired.addCameraZoom(1.25);
     spaceWired.updateIsometricCamera(spaceWired.cameraXaw, spaceWired.cameraYaw);
     spaceWired.setMeshCollection(spacePreview.getMeshCollection());
+	
+    /* For test Three.js
+    //spaceWired.setMeshCollection(spacePreview.getMeshCollection());
+    spaceWired.setMeshCollection(meshes);
+    */
+
 }
 
 function onUserUpdate() 
@@ -5314,6 +5502,11 @@ function onUserUpdate()
      
     if (helpMode === false)
     {
+        /* For test Three.js
+        //piece.mesh.addAngleX(0.01);
+        //piece.mesh.addAngleY(0.02);
+	    */
+	
         spaceWired.update();
         spaceWired.renderInfo();
 
@@ -5579,7 +5772,7 @@ function processInputsObjectMovement()
     if (gEngine.isKeyPressed(C_KEY_CHAR_U) === true && gEngine.getKeyWaitingRelease(C_KEY_CHAR_U) === false)
     {
         gEngine.satKeyWaitRelease(C_KEY_CHAR_U);
-        bluePlane.loadBoard('http://'+ C_SERVER_IP + '/obj/house.bpl'); 
+        bluePlane.loadBoard(JSGameEngine.resolveURLToResourceFolder("house.bpl")); 
     }
 
     if (gEngine.isKeyPressed(C_KEY_SPACE) === true && gEngine.getKeyWaitingRelease(C_KEY_SPACE) === false)

@@ -277,12 +277,12 @@ BluePlane.prototype.createTablero = function(_space)
     this.space.getMeshCollection().push(ground.getMesh());
 
     var pilarBase = new Mesh();
-    pilarBase.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/holeMark.obj', null, true);
+    pilarBase.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("holeMark.obj"), null, true);
     pilarBase.updateCenter();
     pilarBase.center();
  
     var groundBase = new Mesh();
-    groundBase.loadMeshFromFile('http://'+ C_SERVER_IP + '/obj/groundMark.obj', null, true);
+    groundBase.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("groundMark.obj"), null, true);
     groundBase.updateCenter();
     groundBase.center();
  

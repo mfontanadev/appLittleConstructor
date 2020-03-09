@@ -2,7 +2,7 @@
 // Entry point to the aplication, main loop, inputs controlle, core
 //
 
-var C_VERSION_TITLE = "Little constructor (based on JSEngine) v1.2";
+var C_VERSION_TITLE = "Little constructor (based on JSEngine) v1.3";
 var gEngine = null; 
 var C_SERVER_IP = "127.0.0.1:8080";
 
@@ -18,6 +18,8 @@ var C_MOCK_MODE = true;
 function load() 
 {
     console.log(C_VERSION_TITLE);
+    console.log("MOCK_MODE:", C_MOCK_MODE);
+
     document.title = C_VERSION_TITLE;
 
     gEngine = new JSGameEngine(document.getElementById("cv")); 
@@ -41,12 +43,24 @@ var defaultOffY = 0;
 var defaultOffZ = 0;
 var defaultIndex = 0;
 
+/* For test Three.js
+var meshes = new Array();
+var piece = null;
+*/
+
 function onUserCreate() 
 {
     console.log("User create");
 
     gEngine.showTimes(false);
-   
+
+    /* For test Three.js
+    var meshes = new Array();
+    piece = PieceFactory.getInstance().createPiece(PieceFactory.WINDOW);
+    meshes.push(piece.mesh);
+    spacePreview.setMeshCollection(meshes);
+    */
+    
     // Space preview.
     spacePreview.setViewSize(800, 340);
     spacePreview.setViewOffset(0, 0);
@@ -63,7 +77,12 @@ function onUserCreate()
     spacePreview.addCameraZoom(1.4);
     spacePreview.updateIsometricCamera(spacePreview.cameraXaw, spacePreview.cameraYaw);
     bluePlane.setSpace(spacePreview);
-  
+    
+    /* For test Three.js
+    //bluePlane.setSpace(spacePreview);
+    spacePreview.setMeshCollection(meshes);
+    */
+    
     // Space wired and top.
     spaceWired.setViewSize(800, 240);
     spaceWired.setViewOffset(0, 350);
@@ -80,6 +99,12 @@ function onUserCreate()
     spaceWired.addCameraZoom(1.25);
     spaceWired.updateIsometricCamera(spaceWired.cameraXaw, spaceWired.cameraYaw);
     spaceWired.setMeshCollection(spacePreview.getMeshCollection());
+	
+    /* For test Three.js
+    //spaceWired.setMeshCollection(spacePreview.getMeshCollection());
+    spaceWired.setMeshCollection(meshes);
+    */
+
 }
 
 function onUserUpdate() 
@@ -92,6 +117,11 @@ function onUserUpdate()
      
     if (helpMode === false)
     {
+        /* For test Three.js
+        //piece.mesh.addAngleX(0.01);
+        //piece.mesh.addAngleY(0.02);
+	    */
+	
         spaceWired.update();
         spaceWired.renderInfo();
 
@@ -357,7 +387,7 @@ function processInputsObjectMovement()
     if (gEngine.isKeyPressed(C_KEY_CHAR_U) === true && gEngine.getKeyWaitingRelease(C_KEY_CHAR_U) === false)
     {
         gEngine.satKeyWaitRelease(C_KEY_CHAR_U);
-        bluePlane.loadBoard('http://'+ C_SERVER_IP + '/obj/house.bpl'); 
+        bluePlane.loadBoard(JSGameEngine.resolveURLToResourceFolder("house.bpl")); 
     }
 
     if (gEngine.isKeyPressed(C_KEY_SPACE) === true && gEngine.getKeyWaitingRelease(C_KEY_SPACE) === false)
