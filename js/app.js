@@ -4,7 +4,7 @@
 
 var C_VERSION_TITLE = "Little constructor (based on JSEngine) v1.3";
 var gEngine = null; 
-var C_SERVER_IP = "127.0.0.1:8080";
+var C_SERVER_IP = "localhost:8080";
 
 /* Ok this is a big thing. 
 C_MOCK_MODE = true, this means that there is no need to load anything from external. 

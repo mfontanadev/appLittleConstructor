@@ -22,8 +22,11 @@ function Mesh()
     this.worldMatrix = Space.createMatrixIdentity();
     this.imgTexture = new Image();
     this.imgDataTexture = null;
+    this.materialFileName = "";
+    this.textureFileName = "";
     this.alpha = 1;
     this.hide = false;
+    this.meshColor = {r:128, g:128, b:128, a:1};
 }
 
 Mesh.prototype.getId = function() 
@@ -117,83 +120,83 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
 
     for (var i = 0; i < splitted.length; i++) 
     {
-           if (splitted[i].substring(0,7) == "mtllib ")
-           {
-               var splittedRow = splitted[i].split(" ");
-               materialFile = splittedRow[1];
-           }
+        if (splitted[i].substring(0,7) == "mtllib ")
+        {
+            var splittedRow = splitted[i].split(" ");
+            materialFile = splittedRow[1];
+        }
 
-           if (splitted[i].substring(0,7) == "usemtl ")
-           {
-               var splittedRow = splitted[i].split(" ");
-               cacheMaterialsName.push(splittedRow[1]);
-           }
+        if (splitted[i].substring(0,7) == "usemtl ")
+        {
+            var splittedRow = splitted[i].split(" ");
+            cacheMaterialsName.push(splittedRow[1]);
+        }
 
-           if (splitted[i].substring(0,2) == "v ")
-           {
-               var splittedRow = splitted[i].split(" ");
-               
-               var vector = new Vector(
-                       parseFloat(splittedRow[1]), 
-                       parseFloat(splittedRow[2]), 
-                       parseFloat(splittedRow[3]), 
-                       1);
+        if (splitted[i].substring(0,2) == "v ")
+        {
+            var splittedRow = splitted[i].split(" ");
+            
+            var vector = new Vector(
+                    parseFloat(splittedRow[1]), 
+                    parseFloat(splittedRow[2]), 
+                    parseFloat(splittedRow[3]), 
+                    1);
 
-               cacheVertexes.push(vector);
+            cacheVertexes.push(vector);
 
-               var vertexColor = new Vector(0, 0, 0, 0);
-               if (splittedRow.length > 4)
-               {
-                   vertexColor.colored = true;
-                   vertexColor.x = parseFloat(splittedRow[4]);
-                   vertexColor.y = parseFloat(splittedRow[5]);
-                   vertexColor.z = parseFloat(splittedRow[6]);
-                   vertexColor.w = 1;
-               }
+            var vertexColor = new Vector(0, 0, 0, 0);
+            if (splittedRow.length > 4)
+            {
+                vertexColor.colored = true;
+                vertexColor.x = parseFloat(splittedRow[4]);
+                vertexColor.y = parseFloat(splittedRow[5]);
+                vertexColor.z = parseFloat(splittedRow[6]);
+                vertexColor.w = 1;
+            }
 
-               if (splittedRow.length >= 8)
-                    vertexColor.w = parseFloat(splittedRow[7]) / 255;
+            if (splittedRow.length >= 8)
+                vertexColor.w = parseFloat(splittedRow[7]) / 255;
 
-               cacheColorVertexes.push(vertexColor);
-           }
+            cacheColorVertexes.push(vertexColor);
+        }
 
-           if (splitted[i].substring(0,3) == "vt ")
-           {
-               var splittedRow = splitted[i].split(" ");
-               var vector = new Vector(
-                   parseFloat(splittedRow[1]), 
-                   parseFloat(splittedRow[2]), 
-                   0, 
-                   0);
-               cacheVertexTextures.push(vector);
-           }
+        if (splitted[i].substring(0,3) == "vt ")
+        {
+            var splittedRow = splitted[i].split(" ");
+            var vector = new Vector(
+                parseFloat(splittedRow[1]), 
+                parseFloat(splittedRow[2]), 
+                0, 
+                0);
+            cacheVertexTextures.push(vector);
+        }
 
-           if (splitted[i].substring(0,2) == "f ")
-           {
-               var splittedFace = splitted[i].split(" ");
-               var v = 0;
-               var vt = 0;
+        if (splitted[i].substring(0,2) == "f ")
+        {
+            var splittedFace = splitted[i].split(" ");
+            var v = 0;
+            var vt = 0;
 
-               if (splittedFace[1].split("/").length > 1)
-               {
-                   v1 = parseFloat(splittedFace[1].split("/")[0]) - 1;
-                   vt1 = parseFloat(splittedFace[1].split("/")[1]) - 1;
-                   v2 = parseFloat(splittedFace[2].split("/")[0]) - 1;
-                   vt2 = parseFloat(splittedFace[2].split("/")[1]) - 1;
-                   v3 = parseFloat(splittedFace[3].split("/")[0]) - 1;
-                   vt3 = parseFloat(splittedFace[3].split("/")[1]) - 1;
+            if (splittedFace[1].split("/").length > 1)
+            {
+                v1 = parseFloat(splittedFace[1].split("/")[0]) - 1;
+                vt1 = parseFloat(splittedFace[1].split("/")[1]) - 1;
+                v2 = parseFloat(splittedFace[2].split("/")[0]) - 1;
+                vt2 = parseFloat(splittedFace[2].split("/")[1]) - 1;
+                v3 = parseFloat(splittedFace[3].split("/")[0]) - 1;
+                vt3 = parseFloat(splittedFace[3].split("/")[1]) - 1;
 
-                   cacheFaces.push({V1: v1, VT1: vt1, V2: v2, VT2: vt2, V3: v3, VT3: vt3, useTexture: true});
-               }
-               else
-               {
-                   v1 = parseFloat(splittedFace[1]) - 1;
-                   v2 = parseFloat(splittedFace[2]) - 1;
-                   v3 = parseFloat(splittedFace[3]) - 1;
+                cacheFaces.push({V1: v1, VT1: vt1, V2: v2, VT2: vt2, V3: v3, VT3: vt3, useTexture: true});
+            }
+            else
+            {
+                v1 = parseFloat(splittedFace[1]) - 1;
+                v2 = parseFloat(splittedFace[2]) - 1;
+                v3 = parseFloat(splittedFace[3]) - 1;
 
-                   cacheFaces.push({V1: v1, VT1: 0, V2: v2, VT2: 0, V3: v3, VT3: 0, useTexture: false});
-               }
-           }
+                cacheFaces.push({V1: v1, VT1: 0, V2: v2, VT2: 0, V3: v3, VT3: 0, useTexture: false});
+            }
+        }
     }   
 
     for (var i = 0; i < cacheFaces.length; i++) 
@@ -243,6 +246,14 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
         }
 
         this.addTriangle(tri);
+    }   
+
+    // Set global Mesh using the first color in the first index.
+    if (cacheColorVertexes.length > 0)
+    {
+        var vertexColor = cacheColorVertexes[0];
+        if (vertexColor !== null && vertexColor.colored === true)
+            this.color(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w);
     }
 
     if (materialFile !== "" && cacheMaterialsName.length > 0)
@@ -267,11 +278,11 @@ Mesh.prototype.loadTextureFromMaterialFile = function(_fileName, _materialNames)
 
 Mesh.prototype.loadTextureFromMaterialFileMock = function(_fileName, _materialNames) 
 {
-    this.fileName = JSGameEngine.resolveURLToResourceFolder(_fileName).toLowerCase();
+    this.materialFileName = JSGameEngine.resolveURLToResourceFolder(_fileName).toLowerCase();
 
-    if (mockedObj.has(this.fileName) === true)
+    if (mockedObj.has(this.materialFileName) === true)
     {
-        var responseText = mockedObj.get(this.fileName);
+        var responseText = mockedObj.get(this.materialFileName);
         responseText = responseText.replace(/&lf;/g, "\n");
         this.parseMaterialFile(_fileName, responseText, _materialNames);	            
     }
@@ -280,10 +291,10 @@ Mesh.prototype.loadTextureFromMaterialFileMock = function(_fileName, _materialNa
 Mesh.prototype.loadTextureFromMaterialFileServer = function(_fileName, _materialNames) 
 {
     var thisClass = this;
-    this.fileName = _fileName;
+    this.materialFileName = "/obj/" + _fileName;
 
     var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", _fileName, false);
+    rawFile.open("GET", this.materialFileName, false);
     rawFile.onreadystatechange = function ()
     {
         var loadedOk = false;
@@ -293,7 +304,7 @@ Mesh.prototype.loadTextureFromMaterialFileServer = function(_fileName, _material
         {
             if(rawFile.status === 200 || rawFile.status == 0)
             {
-                thisClass.parseMaterialFile(_fileName, rawFile.responseText, _materialNames);
+                thisClass.parseMaterialFile(thisClass.materialFileName, rawFile.responseText, _materialNames);
                 loadedOk = true;
             }
         }
@@ -332,6 +343,11 @@ Mesh.prototype.parseMaterialFile = function(_fileName, _data, _materialsNames)
 
 Mesh.prototype.color = function(_r, _g, _b, _a) 
 {
+    this.meshColor.r = _r;
+    this.meshColor.g = _g;
+    this.meshColor.b = _b;
+    this.meshColor.a = _a;
+
     this.tris.forEach(element => {
         element.faceColor.r = _r;
         element.faceColor.g = _g;
@@ -562,10 +578,14 @@ Mesh.prototype.loadTexture = function(_url)
 {
     var url = "";
 
+    this.textureFileName = JSGameEngine.resolveURLToResourceFolder(_url).toLowerCase();
     if (C_MOCK_MODE === true)
     {
-        var filename = JSGameEngine.resolveURLToResourceFolder(_url).toLowerCase();
-        url = mockedObj.get(filename); 
+        url = mockedObj.get(this.textureFileName); 
+    }
+    else
+    {
+        url = this.textureFileName; 
     }
 
     this.loadTextureFile(url);
@@ -603,6 +623,7 @@ Mesh.prototype.loadTextureFile = function(_url)
         console.log(e);
     }	
 
+    console.log("loadTextureFile: " + _url)
     this.imgTexture.crossOrigin = "Anonymous";
     this.imgTexture.src = _url;
 }

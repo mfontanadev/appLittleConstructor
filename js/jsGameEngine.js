@@ -620,6 +620,17 @@ JSGameEngine.prototype.rgbaToColor = function(_r, _g, _b, _a)
     return result;
 }
 
+JSGameEngine.st_rgbaToColor = function(_r, _g, _b) 
+{
+    var r = _r % 256;
+    var g = _g % 256;
+    var b = _b % 256;
+
+     var result = "rgb(" + r.toString() + "," + g.toString() + "," + b.toString() + ")";
+    
+    return result;
+}
+
 JSGameEngine.prototype.startTime = function(_key)
 {
     var foundItem = this.chFoundTimeKey(_key);
