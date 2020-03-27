@@ -39,8 +39,6 @@ function Space()
     this.renderMode = Space.C_RENDER_MODE_TRIANGLE_FILL;
     this.illuminationMode = Space.C_ILLUMINATOIN_MODE_LIGHT;
 
-    this.meshCollection = new Array();
-
     this.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
     this.cameraControlEnabled = false;
     this.ambientLightFactor = 0;    // 0 has no insidence, 1 full light.
@@ -383,7 +381,7 @@ Space.prototype.getGrayedColorFromLight = function(_light, _triNormal, _faceColo
     return {r: red, g: green, b: blue, a: alpha};
 }
 
-Space.prototype.update = function()
+Space.prototype.update = function(_meshCollection, _forceSceneUpdate)
 { 
     var sceneTiranglesToRender = new Array();
 
@@ -421,9 +419,9 @@ Space.prototype.update = function()
 
     // Calculate render data for each mesh.
     var meshItem = null;
-    for (var i = 0; i < this.getMeshCollection().length; i++) 
+    for (var i = 0; i < _meshCollection.length; i++) 
     {
-        meshItem = this.getMeshCollection()[i];
+        meshItem = _meshCollection[i];
         if (meshItem.hide === false)
         {
             meshItem.worldMatrix = this.createMatrixIdentity();
@@ -468,7 +466,7 @@ Space.prototype.update = function()
     
     if (gEngine.logTimes === true)
     {
-        console.log("Count triangles:", sceneTiranglesToRender.length, "(mesh =", this.getMeshCollection().length, ")");
+        console.log("Count triangles:", sceneTiranglesToRender.length, "(mesh =", _meshCollection.length, ")");
     }
 }
 
@@ -1015,95 +1013,8 @@ Space.prototype.drawTriangles = function(_listTriangles)
     }
 }
 
-Space.prototype.renderLookAt = function(_space, _currentLayer)
+Space.prototype.renderLookAt = function(_currentLayer)
 { 
-    var vCamera = _space.getCamera();
-    var vLookDir = _space.getLookAtVector();
-    var rotX = this.getMeshCollection()[0].getRotation().x;
-    var rotY = this.getMeshCollection()[0].getRotation().y;
-    var rotZ = this.getMeshCollection()[0].getRotation().z;
-
-    // Viewport
-    var rectSize = 100;
-    var r = {   x1: this.viewWidth - rectSize + this.viewOffsetX,
-        y1: 0 + this.viewOffsetY, 
-        x2: this.viewWidth + this.viewOffsetX , 
-        y2: rectSize + this.viewOffsetY};
-    
-    var rmx = r.x1 + rectSize / 2;
-    var rmy = r.y1 + rectSize / 2;
-
-    gEngine.renderRectangle(r.x1, r.y1, rectSize, rectSize, 1, "green");
-    gEngine.renderLine(rmx, r.y1, rmx, r.y1 + rectSize, 1, "green");
-    gEngine.renderLine(r.x1, rmy, r.x1 + rectSize, rmy, 1, "green");
-
-    // Camera position			
-    var cameraPosText = "C Pos: " + Math.round(vCamera.x) + "," + Math.round(vCamera.y) + "," + Math.round(vCamera.z) + "";
-    gEngine.renderText(r.x1, r.y1 + rectSize + 10, cameraPosText, "green");
-
-    // Camera angles			
-    var cameraRotText = "C Ang: " + Math.round(JSGameEngine.radToGra (_space.cameraXaw)) + "," + 
-    Math.round(JSGameEngine.radToGra (_space.cameraYaw)) + "," + (_space.cameraZoom).toFixed(2);
-    gEngine.renderText(r.x1, r.y1 + rectSize + 20, cameraRotText, "green");
-
-    // Rotation values			
-    var cameraPosText = "Rot sel: " + Math.round(JSGameEngine.radToGra (rotX)) + "," + Math.round(JSGameEngine.radToGra (rotY)) + "," + Math.round(JSGameEngine.radToGra (rotZ)) + "";
-    gEngine.renderText(r.x1, r.y1 + rectSize + 30, cameraPosText, "green");
-
-    // Cursor
-    var k = JSGameEngine.C_VIEWPORT_SCALE;
-
-    var mw = this.viewWidth / 2;
-    var mh = this.viewHeight / 2;
-    
-    var x1 = vCamera.x;
-    var y1 = vCamera.z;
-
-    var x2 = x1 * k + (vLookDir.x * JSGameEngine.C_VIEWPORT_CURSOR_LENGTH);
-    var y2 = y1 * k + (vLookDir.z * JSGameEngine.C_VIEWPORT_CURSOR_LENGTH);
-
-    gEngine.renderLine(rmx + x1 * k, rmy - y1 * k, rmx + x2, rmy - y2, 1, JSGameEngine.FG_WHITE);
-    gEngine.renderCircle(rmx + x1 * k, rmy - y1 * k, 2, 0, JSGameEngine.FG_WHITE);
-
-    // Projection information
-    var projectionInfo = ""
-    if (this.projectionType === true)
-        projectionInfo = "P=P";
-    else
-        projectionInfo = "P=I";
-    gEngine.renderText(r.x1 - 30, r.y1 + 9, projectionInfo, "yellow");
-
-    // Illumination information
-    var fillTypeInfo = ""
-    if (this.illuminationMode === Space.C_ILLUMINATOIN_MODE_SOLID)
-        fillTypeInfo = "I=S";
-    else if (this.illuminationMode === Space.C_ILLUMINATOIN_MODE_LIGHT)
-        fillTypeInfo = "I=L";
-    gEngine.renderText(r.x1 - 30, r.y1 + 19, fillTypeInfo, "yellow");
-
-    // Wireframe information
-    var wireframeInfo = ""
-    if (this.renderMode === Space.C_RENDER_MODE_WIREFRAME)
-        wireframeInfo = "M=W";
-    else if (this.renderMode === Space.C_RENDER_MODE_TRIANGLE_FILL)
-        wireframeInfo = "M=T";
-    else if (this.renderMode === Space.C_RENDER_MODE_PIXEL_FILL)
-            wireframeInfo = "M=P";
-    gEngine.renderText(r.x1 - 30, r.y1 + 29, wireframeInfo, "yellow");
-
-    // Camera control information
-    var cameraControlInfo = ""
-    if (this.cameraControlEnabled === true)
-        cameraControlInfo = "C";
-    else
-        cameraControlInfo = "c";
-    gEngine.renderText(r.x1 - 30, r.y1 + 39, cameraControlInfo, "yellow");			
-
-    // Current layer.
-    if (_currentLayer !== -1)
-    {
-        gEngine.renderText(r.x1 - 30, r.y1 + 49, "CL=" + _currentLayer, "yellow");
-    }			    
 }
 
 Space.prototype.renderInfo = function(_space)
@@ -1129,29 +1040,6 @@ Space.prototype.renderInfo = function(_space)
     gEngine.setFontSize(9);
 }
 
-Space.prototype.getMeshCollection = function()
-{ 
-    return this.meshCollection;
-}
-
-Space.prototype.setMeshCollection = function(_meshCollection)
-{ 
-    this.meshCollection = _meshCollection;
-}
-
-Space.prototype.removePiece = function(_pieceId) 
-{
-    var removeIndex = -1;
-    for (let index = 0; index < this.meshCollection.length; index++) 
-    {
-        const element = this.meshCollection[index];
-        if (element.getId() === _pieceId)
-            removeIndex = index; 
-    }
-
-    if (removeIndex !== -1)
-        this.meshCollection.splice(removeIndex, 1);
-}
 
 Space.prototype.changeRenderMode = function() 
 {
@@ -1165,10 +1053,13 @@ Space.prototype.changeRenderMode = function()
 
 Space.prototype.changeProjectionType = function() 
 {
+    this.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
+    /*
     if (this.projectionType === Space.C_PROJECTION_TYPE_ISOMETRIC)
         this.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
     else if (this.projectionType === Space.C_PROJECTION_TYPE_PERSPECTIVE)
         this.projectionType = Space.C_PROJECTION_TYPE_ISOMETRIC;
+    */
 }
 
 Space.prototype.changeIlluminationMode = function() 

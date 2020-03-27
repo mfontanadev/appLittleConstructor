@@ -13,9 +13,11 @@ function BluePlane()
 {
     this.linkPoints = new Array();
     this.cursor = new Cursor();
-    this.space = null;
     this.selectedPiece = null;
     this.currentLayer = -1;  // 0 means all layers.
+
+    this.meshCollection = new Array();
+    this.dataModified = false;
 
     this.initPlane();
 }
@@ -84,6 +86,18 @@ BluePlane.prototype.initPlane = function()
                     this.initialLinkPointGround = item;
             }
         }
+
+    // Add cursor to current space.
+    var linkPoint = this.getLinkPointAtIndex(0, 0); 
+
+    this.cursor.piece = PieceFactory.getInstance().createPiece(PieceFactory.CURSOR);
+    this.cursor.piece.setSelected(true);
+    this.cursor.setLink(this.getLinkPointAtIndex(0, 0));
+    
+    this.addMesh(this.cursor.getMesh());
+
+    // Add tablero made by the union of ground and cursor marks.
+    this.createTablero();
 }
 
 BluePlane.prototype.getLinkPointAtIndex = function(_column, _row) 
@@ -106,6 +120,7 @@ BluePlane.prototype.moveCursor = function(_columnDelta, _rowDelta)
         actualY + _rowDelta >= 0 && actualY + _rowDelta < BluePlane.C_BOARD_ROWS)
     {
         this.cursor.setLink(this.getLinkPointAtIndex(actualX + _columnDelta, actualY + _rowDelta));
+        this.setModifiedData(true);
     }
 }
 
@@ -148,7 +163,7 @@ BluePlane.prototype.addPieceAtLink = function(_link, _pieceType)
     if (this.movePieceToLinkPosition(_link, piece) === true)
     {
         _link.pieces.push(piece);
-        this.space.getMeshCollection().push(piece.mesh);
+        this.addMesh(piece.mesh);
         this.reorganizePiecesYPosition(_link);
     }
     else
@@ -244,29 +259,12 @@ BluePlane.prototype.deleteSelectedPiece = function()
     this.cursor.getLink().removePiece(pieceId);
     this.reorganizePiecesYPosition(this.cursor.getLink());
     
-    this.space.removePiece(meshId);
+    this.removePiece(meshId);
 
     this.selectedPiece = null;
 }
 
-BluePlane.prototype.setSpace = function(_space) 
-{
-    this.space = _space;
-
-    // Add cursor to current space.
-    var linkPoint = this.getLinkPointAtIndex(0, 0); 
-
-    this.cursor.piece = PieceFactory.getInstance().createPiece(PieceFactory.CURSOR);
-    this.cursor.piece.setSelected(true);
-    this.cursor.setLink(this.getLinkPointAtIndex(0, 0));
-    
-    this.space.getMeshCollection().push(this.cursor.getMesh());
-
-    // Add tablero made by the union of ground and cursor marks.
-    this.createTablero();
-}
-
-BluePlane.prototype.createTablero = function(_space) 
+BluePlane.prototype.createTablero = function() 
 {
     var linkPoint = null;
     var pilar = null;
@@ -274,7 +272,7 @@ BluePlane.prototype.createTablero = function(_space)
     //
     var ground = new Piece();
     ground = PieceFactory.getInstance().createPiece(PieceFactory.BOARD);
-    this.space.getMeshCollection().push(ground.getMesh());
+    this.addMesh(ground.getMesh());
 
     var pilarBase = new Mesh();
     pilarBase.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("holeMark.obj"), null, true);
@@ -290,7 +288,7 @@ BluePlane.prototype.createTablero = function(_space)
     {
         for (var x = 0; x < BluePlane.C_BOARD_COLUMNS; x++)
         {
-            linkPoint = bluePlane.getLinkPointAtIndex(x, y);
+            linkPoint = this.getLinkPointAtIndex(x, y);
 
             pilar = null;
             if (linkPoint.isHoleType() === true)
@@ -313,7 +311,7 @@ BluePlane.prototype.createTablero = function(_space)
             {
                 pilar.setPosition(linkPoint.position.x, linkPoint.position.y, linkPoint.position.z);
                 pilar.setZOrder(2);
-                this.space.getMeshCollection().push(pilar);
+                this.addMesh(pilar);
             }
         }
     }
@@ -709,8 +707,54 @@ BluePlane.prototype.onlyShowCurrentLayer = function()
             if (p === this.currentLayer || this.currentLayer === -1)
             {
                 elementPiece.getMesh().hide = false;
+                this.setModifiedData(true);
             }
         }            
     }
+}
+
+BluePlane.prototype.addMesh = function(_mesh)
+{ 
+    this.getMeshCollection().push(_mesh);
+    this.setModifiedData(true);
+}
+
+BluePlane.prototype.getMeshCollection = function()
+{ 
+    return this.meshCollection;
+}
+
+BluePlane.prototype.setMeshCollection = function(_meshCollection)
+{ 
+    this.meshCollection = _meshCollection;
+}
+
+BluePlane.prototype.removePiece = function(_pieceId) 
+{
+    var removeIndex = -1;
+    for (let index = 0; index < this.meshCollection.length; index++) 
+    {
+        const element = this.meshCollection[index];
+        if (element.getId() === _pieceId)
+        {
+            removeIndex = index; 
+        }
+    }
+
+    if (removeIndex !== -1)
+    {
+        this.meshCollection.splice(removeIndex, 1);
+        this.setModifiedData(true);
+    }
+}
+
+BluePlane.prototype.setModifiedData = function(_value) 
+{
+    this.dataModified = _value;
+}
+
+BluePlane.prototype.isDataModified = function(_pieceId) 
+{
+    return this.dataModified;
 }
 

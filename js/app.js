@@ -2,7 +2,7 @@
 // Entry point to the aplication, main loop, inputs controlle, core
 //
 
-var C_VERSION_TITLE = "Little constructor (based on JSEngine) v1.3";
+var C_VERSION_TITLE = "Little constructor ThreeJS (based on JSEngine + ThreeJS) v2.0";
 var gEngine = null; 
 var C_SERVER_IP = "localhost:8080";
 
@@ -29,7 +29,7 @@ function load()
 // --------------------------------------------------------------------
 // Game data
 //
-var spacePreview = new Space();
+var spacePreview = new SpaceThree();
 var spaceWired = new Space();
 var bluePlane = new BluePlane();
 var helpMode = false;
@@ -43,68 +43,53 @@ var defaultOffY = 0;
 var defaultOffZ = 0;
 var defaultIndex = 0;
 
-/* For test Three.js
-var meshes = new Array();
-var piece = null;
-*/
-
 function onUserCreate() 
 {
     console.log("User create");
 
+    /*
     gEngine.showTimes(false);
-
-    /* For test Three.js
-    var meshes = new Array();
-    piece = PieceFactory.getInstance().createPiece(PieceFactory.WINDOW);
-    meshes.push(piece.mesh);
-    spacePreview.setMeshCollection(meshes);
     */
-    
-    // Space preview.
-    spacePreview.setViewSize(800, 340);
-    spacePreview.setViewOffset(0, 0);
 
-    spacePreview.normalsVisible = false;
-    spacePreview.linesVisible = false;
-    spacePreview.setLight(0, 500, 0);
-    spacePreview.ambientLightFactor = 0.5;
-    spacePreview.projectionType = Space.C_PROJECTION_TYPE_ISOMETRIC;
-
-    spacePreview.setCamera(-180, 0, -180);
-    spacePreview.cameraXaw = JSGameEngine.graToRad(-26);
-    spacePreview.cameraYaw = JSGameEngine.graToRad(-43);
-    spacePreview.addCameraZoom(1.4);
-    spacePreview.updateIsometricCamera(spacePreview.cameraXaw, spacePreview.cameraYaw);
-    bluePlane.setSpace(spacePreview);
-    
-    /* For test Three.js
-    //bluePlane.setSpace(spacePreview);
-    spacePreview.setMeshCollection(meshes);
-    */
-    
     // Space wired and top.
     spaceWired.setViewSize(800, 240);
-    spaceWired.setViewOffset(0, 350);
-
+    spaceWired.setViewOffset(0, 10);
     spaceWired.normalsVisible = false;
     spaceWired.linesVisible = false;
     spaceWired.renderMode = Space.C_RENDER_MODE_WIREFRAME;
     spaceWired.setLight(0, 500, 0);
     spaceWired.ambientLightFactor = 0.5;
     spaceWired.projectionType = Space.C_PROJECTION_TYPE_ISOMETRIC;
-
     spaceWired.setCamera(0, 300, 0);
+
     spaceWired.cameraXaw = JSGameEngine.graToRad(-90);
     spaceWired.addCameraZoom(1.25);
     spaceWired.updateIsometricCamera(spaceWired.cameraXaw, spaceWired.cameraYaw);
-    spaceWired.setMeshCollection(spacePreview.getMeshCollection());
-	
-    /* For test Three.js
-    //spaceWired.setMeshCollection(spacePreview.getMeshCollection());
-    spaceWired.setMeshCollection(meshes);
-    */
+    
+    // Space preview.
+    spacePreview.appendToDocumentBody();
+    spacePreview.setViewSize(512, 320);
+    spacePreview.setViewOffset(0, 0);
+    spacePreview.normalsVisible = false;
+    spacePreview.linesVisible = false;
+    //spacePreview.setLight(0, 500, 0);
+    //spacePreview.addHemisphereLight(0xB1E1FF, 0xB97A20);
+    spacePreview.addDirectionalLight(0xFFA0A0, 500, 200  ,-500,   0,0,0);
+    spacePreview.addDirectionalLight(0xA0FFA0, -500, 200  ,-500,   0,0,0);
 
+    spacePreview.addDirectionalLight(0xA0A0FF, 500, 200  ,500,   0,0,0);
+    spacePreview.addDirectionalLight(0xA0A0A0, -500, 200 ,500,   0,0,0);
+
+    spacePreview.ambientLightFactor = 0.5;
+    spacePreview.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
+    spacePreview.setCamera(0, 80, -10);
+
+/*    
+    var pieceTestCollection = new Array();
+    var piecePilar = PieceFactory.getInstance().createPiece(PieceFactory.PILAR_SMALL);
+    piecePilar.mesh.setPosition(0, 0, -100);
+    bluePlane.addMesh(piecePilar.mesh);
+*/
 }
 
 function onUserUpdate() 
@@ -117,21 +102,21 @@ function onUserUpdate()
      
     if (helpMode === false)
     {
-        /* For test Three.js
-        //piece.mesh.addAngleX(0.01);
-        //piece.mesh.addAngleY(0.02);
-	    */
-	
-        spaceWired.update();
+        spaceWired.update(bluePlane.getMeshCollection(), bluePlane.isDataModified());
         spaceWired.renderInfo();
+        spaceWired.renderLookAt(bluePlane.currentLayer);
 
-        spacePreview.update();
-        spacePreview.renderLookAt(spacePreview, bluePlane.currentLayer);
+        spacePreview.update(bluePlane.getMeshCollection(), bluePlane.isDataModified());
+        spacePreview.renderInfo();
+        spacePreview.renderLookAt(bluePlane.currentLayer);
+
+        bluePlane.setModifiedData(false);
     }
     else
     {
         showHelpScreen();
     }
+    
 }
 
 function processInputs()
@@ -235,6 +220,8 @@ function processInputsCameraEnabled()
             if (gEngine.isKeyPressed(C_KEY_DOWN) === true)
                 spacePreview.getCamera().sub(vForward);
         }
+
+        spacePreview.updateIsometricCamera(spacePreview.cameraXaw, spacePreview.cameraYaw);
     }
     else
     {

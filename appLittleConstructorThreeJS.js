@@ -1657,8 +1657,6 @@ function Space()
     this.renderMode = Space.C_RENDER_MODE_TRIANGLE_FILL;
     this.illuminationMode = Space.C_ILLUMINATOIN_MODE_LIGHT;
 
-    this.meshCollection = new Array();
-
     this.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
     this.cameraControlEnabled = false;
     this.ambientLightFactor = 0;    // 0 has no insidence, 1 full light.
@@ -2001,7 +1999,7 @@ Space.prototype.getGrayedColorFromLight = function(_light, _triNormal, _faceColo
     return {r: red, g: green, b: blue, a: alpha};
 }
 
-Space.prototype.update = function()
+Space.prototype.update = function(_meshCollection, _forceSceneUpdate)
 { 
     var sceneTiranglesToRender = new Array();
 
@@ -2039,9 +2037,9 @@ Space.prototype.update = function()
 
     // Calculate render data for each mesh.
     var meshItem = null;
-    for (var i = 0; i < this.getMeshCollection().length; i++) 
+    for (var i = 0; i < _meshCollection.length; i++) 
     {
-        meshItem = this.getMeshCollection()[i];
+        meshItem = _meshCollection[i];
         if (meshItem.hide === false)
         {
             meshItem.worldMatrix = this.createMatrixIdentity();
@@ -2086,7 +2084,7 @@ Space.prototype.update = function()
     
     if (gEngine.logTimes === true)
     {
-        console.log("Count triangles:", sceneTiranglesToRender.length, "(mesh =", this.getMeshCollection().length, ")");
+        console.log("Count triangles:", sceneTiranglesToRender.length, "(mesh =", _meshCollection.length, ")");
     }
 }
 
@@ -2633,95 +2631,8 @@ Space.prototype.drawTriangles = function(_listTriangles)
     }
 }
 
-Space.prototype.renderLookAt = function(_space, _currentLayer)
+Space.prototype.renderLookAt = function(_currentLayer)
 { 
-    var vCamera = _space.getCamera();
-    var vLookDir = _space.getLookAtVector();
-    var rotX = this.getMeshCollection()[0].getRotation().x;
-    var rotY = this.getMeshCollection()[0].getRotation().y;
-    var rotZ = this.getMeshCollection()[0].getRotation().z;
-
-    // Viewport
-    var rectSize = 100;
-    var r = {   x1: this.viewWidth - rectSize + this.viewOffsetX,
-        y1: 0 + this.viewOffsetY, 
-        x2: this.viewWidth + this.viewOffsetX , 
-        y2: rectSize + this.viewOffsetY};
-    
-    var rmx = r.x1 + rectSize / 2;
-    var rmy = r.y1 + rectSize / 2;
-
-    gEngine.renderRectangle(r.x1, r.y1, rectSize, rectSize, 1, "green");
-    gEngine.renderLine(rmx, r.y1, rmx, r.y1 + rectSize, 1, "green");
-    gEngine.renderLine(r.x1, rmy, r.x1 + rectSize, rmy, 1, "green");
-
-    // Camera position			
-    var cameraPosText = "C Pos: " + Math.round(vCamera.x) + "," + Math.round(vCamera.y) + "," + Math.round(vCamera.z) + "";
-    gEngine.renderText(r.x1, r.y1 + rectSize + 10, cameraPosText, "green");
-
-    // Camera angles			
-    var cameraRotText = "C Ang: " + Math.round(JSGameEngine.radToGra (_space.cameraXaw)) + "," + 
-    Math.round(JSGameEngine.radToGra (_space.cameraYaw)) + "," + (_space.cameraZoom).toFixed(2);
-    gEngine.renderText(r.x1, r.y1 + rectSize + 20, cameraRotText, "green");
-
-    // Rotation values			
-    var cameraPosText = "Rot sel: " + Math.round(JSGameEngine.radToGra (rotX)) + "," + Math.round(JSGameEngine.radToGra (rotY)) + "," + Math.round(JSGameEngine.radToGra (rotZ)) + "";
-    gEngine.renderText(r.x1, r.y1 + rectSize + 30, cameraPosText, "green");
-
-    // Cursor
-    var k = JSGameEngine.C_VIEWPORT_SCALE;
-
-    var mw = this.viewWidth / 2;
-    var mh = this.viewHeight / 2;
-    
-    var x1 = vCamera.x;
-    var y1 = vCamera.z;
-
-    var x2 = x1 * k + (vLookDir.x * JSGameEngine.C_VIEWPORT_CURSOR_LENGTH);
-    var y2 = y1 * k + (vLookDir.z * JSGameEngine.C_VIEWPORT_CURSOR_LENGTH);
-
-    gEngine.renderLine(rmx + x1 * k, rmy - y1 * k, rmx + x2, rmy - y2, 1, JSGameEngine.FG_WHITE);
-    gEngine.renderCircle(rmx + x1 * k, rmy - y1 * k, 2, 0, JSGameEngine.FG_WHITE);
-
-    // Projection information
-    var projectionInfo = ""
-    if (this.projectionType === true)
-        projectionInfo = "P=P";
-    else
-        projectionInfo = "P=I";
-    gEngine.renderText(r.x1 - 30, r.y1 + 9, projectionInfo, "yellow");
-
-    // Illumination information
-    var fillTypeInfo = ""
-    if (this.illuminationMode === Space.C_ILLUMINATOIN_MODE_SOLID)
-        fillTypeInfo = "I=S";
-    else if (this.illuminationMode === Space.C_ILLUMINATOIN_MODE_LIGHT)
-        fillTypeInfo = "I=L";
-    gEngine.renderText(r.x1 - 30, r.y1 + 19, fillTypeInfo, "yellow");
-
-    // Wireframe information
-    var wireframeInfo = ""
-    if (this.renderMode === Space.C_RENDER_MODE_WIREFRAME)
-        wireframeInfo = "M=W";
-    else if (this.renderMode === Space.C_RENDER_MODE_TRIANGLE_FILL)
-        wireframeInfo = "M=T";
-    else if (this.renderMode === Space.C_RENDER_MODE_PIXEL_FILL)
-            wireframeInfo = "M=P";
-    gEngine.renderText(r.x1 - 30, r.y1 + 29, wireframeInfo, "yellow");
-
-    // Camera control information
-    var cameraControlInfo = ""
-    if (this.cameraControlEnabled === true)
-        cameraControlInfo = "C";
-    else
-        cameraControlInfo = "c";
-    gEngine.renderText(r.x1 - 30, r.y1 + 39, cameraControlInfo, "yellow");			
-
-    // Current layer.
-    if (_currentLayer !== -1)
-    {
-        gEngine.renderText(r.x1 - 30, r.y1 + 49, "CL=" + _currentLayer, "yellow");
-    }			    
 }
 
 Space.prototype.renderInfo = function(_space)
@@ -2747,29 +2658,6 @@ Space.prototype.renderInfo = function(_space)
     gEngine.setFontSize(9);
 }
 
-Space.prototype.getMeshCollection = function()
-{ 
-    return this.meshCollection;
-}
-
-Space.prototype.setMeshCollection = function(_meshCollection)
-{ 
-    this.meshCollection = _meshCollection;
-}
-
-Space.prototype.removePiece = function(_pieceId) 
-{
-    var removeIndex = -1;
-    for (let index = 0; index < this.meshCollection.length; index++) 
-    {
-        const element = this.meshCollection[index];
-        if (element.getId() === _pieceId)
-            removeIndex = index; 
-    }
-
-    if (removeIndex !== -1)
-        this.meshCollection.splice(removeIndex, 1);
-}
 
 Space.prototype.changeRenderMode = function() 
 {
@@ -2783,10 +2671,13 @@ Space.prototype.changeRenderMode = function()
 
 Space.prototype.changeProjectionType = function() 
 {
+    this.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
+    /*
     if (this.projectionType === Space.C_PROJECTION_TYPE_ISOMETRIC)
         this.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
     else if (this.projectionType === Space.C_PROJECTION_TYPE_PERSPECTIVE)
         this.projectionType = Space.C_PROJECTION_TYPE_ISOMETRIC;
+    */
 }
 
 Space.prototype.changeIlluminationMode = function() 
@@ -3448,10 +3339,15 @@ function Mesh()
     this.worldMatrix = Space.createMatrixIdentity();
     this.imgTexture = new Image();
     this.imgDataTexture = null;
+    this.updateMeshBecauseTextureWasLoaded = false;
     this.materialFileName = "";
     this.textureFileName = "";
     this.alpha = 1;
     this.hide = false;
+
+    this.points = new Array();
+    this.faces = new Array();
+
     this.meshColor = {r:128, g:128, b:128, a:1};
 }
 
@@ -3567,6 +3463,7 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
                     parseFloat(splittedRow[2]), 
                     parseFloat(splittedRow[3]), 
                     1);
+            this.points.push(vector);
 
             cacheVertexes.push(vector);
 
@@ -3671,6 +3568,9 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
             }
         }
 
+        var face = new Vector(v1, v2, v3);
+	    this.faces.push(face);
+			    
         this.addTriangle(tri);
     }   
 
@@ -4040,6 +3940,7 @@ Mesh.prototype.loadTextureFile = function(_url)
             newContext.drawImage(_this.imgTexture, 0, 0);
 
             _this.imgDataTexture = newContext.getImageData(0, 0,imgWidth, imgHeight);
+            _this.updateMeshBecauseTextureWasLoaded = true;
         }
     }			
 
@@ -4653,9 +4554,11 @@ function BluePlane()
 {
     this.linkPoints = new Array();
     this.cursor = new Cursor();
-    this.space = null;
     this.selectedPiece = null;
     this.currentLayer = -1;  // 0 means all layers.
+
+    this.meshCollection = new Array();
+    this.dataModified = false;
 
     this.initPlane();
 }
@@ -4724,6 +4627,18 @@ BluePlane.prototype.initPlane = function()
                     this.initialLinkPointGround = item;
             }
         }
+
+    // Add cursor to current space.
+    var linkPoint = this.getLinkPointAtIndex(0, 0); 
+
+    this.cursor.piece = PieceFactory.getInstance().createPiece(PieceFactory.CURSOR);
+    this.cursor.piece.setSelected(true);
+    this.cursor.setLink(this.getLinkPointAtIndex(0, 0));
+    
+    this.addMesh(this.cursor.getMesh());
+
+    // Add tablero made by the union of ground and cursor marks.
+    this.createTablero();
 }
 
 BluePlane.prototype.getLinkPointAtIndex = function(_column, _row) 
@@ -4746,6 +4661,7 @@ BluePlane.prototype.moveCursor = function(_columnDelta, _rowDelta)
         actualY + _rowDelta >= 0 && actualY + _rowDelta < BluePlane.C_BOARD_ROWS)
     {
         this.cursor.setLink(this.getLinkPointAtIndex(actualX + _columnDelta, actualY + _rowDelta));
+        this.setModifiedData(true);
     }
 }
 
@@ -4788,7 +4704,7 @@ BluePlane.prototype.addPieceAtLink = function(_link, _pieceType)
     if (this.movePieceToLinkPosition(_link, piece) === true)
     {
         _link.pieces.push(piece);
-        this.space.getMeshCollection().push(piece.mesh);
+        this.addMesh(piece.mesh);
         this.reorganizePiecesYPosition(_link);
     }
     else
@@ -4884,29 +4800,12 @@ BluePlane.prototype.deleteSelectedPiece = function()
     this.cursor.getLink().removePiece(pieceId);
     this.reorganizePiecesYPosition(this.cursor.getLink());
     
-    this.space.removePiece(meshId);
+    this.removePiece(meshId);
 
     this.selectedPiece = null;
 }
 
-BluePlane.prototype.setSpace = function(_space) 
-{
-    this.space = _space;
-
-    // Add cursor to current space.
-    var linkPoint = this.getLinkPointAtIndex(0, 0); 
-
-    this.cursor.piece = PieceFactory.getInstance().createPiece(PieceFactory.CURSOR);
-    this.cursor.piece.setSelected(true);
-    this.cursor.setLink(this.getLinkPointAtIndex(0, 0));
-    
-    this.space.getMeshCollection().push(this.cursor.getMesh());
-
-    // Add tablero made by the union of ground and cursor marks.
-    this.createTablero();
-}
-
-BluePlane.prototype.createTablero = function(_space) 
+BluePlane.prototype.createTablero = function() 
 {
     var linkPoint = null;
     var pilar = null;
@@ -4914,7 +4813,7 @@ BluePlane.prototype.createTablero = function(_space)
     //
     var ground = new Piece();
     ground = PieceFactory.getInstance().createPiece(PieceFactory.BOARD);
-    this.space.getMeshCollection().push(ground.getMesh());
+    this.addMesh(ground.getMesh());
 
     var pilarBase = new Mesh();
     pilarBase.loadMeshFromFile(JSGameEngine.resolveURLToResourceFolder("holeMark.obj"), null, true);
@@ -4930,7 +4829,7 @@ BluePlane.prototype.createTablero = function(_space)
     {
         for (var x = 0; x < BluePlane.C_BOARD_COLUMNS; x++)
         {
-            linkPoint = bluePlane.getLinkPointAtIndex(x, y);
+            linkPoint = this.getLinkPointAtIndex(x, y);
 
             pilar = null;
             if (linkPoint.isHoleType() === true)
@@ -4953,7 +4852,7 @@ BluePlane.prototype.createTablero = function(_space)
             {
                 pilar.setPosition(linkPoint.position.x, linkPoint.position.y, linkPoint.position.z);
                 pilar.setZOrder(2);
-                this.space.getMeshCollection().push(pilar);
+                this.addMesh(pilar);
             }
         }
     }
@@ -5349,11 +5248,520 @@ BluePlane.prototype.onlyShowCurrentLayer = function()
             if (p === this.currentLayer || this.currentLayer === -1)
             {
                 elementPiece.getMesh().hide = false;
+                this.setModifiedData(true);
             }
         }            
     }
 }
 
+BluePlane.prototype.addMesh = function(_mesh)
+{ 
+    this.getMeshCollection().push(_mesh);
+    this.setModifiedData(true);
+}
+
+BluePlane.prototype.getMeshCollection = function()
+{ 
+    return this.meshCollection;
+}
+
+BluePlane.prototype.setMeshCollection = function(_meshCollection)
+{ 
+    this.meshCollection = _meshCollection;
+}
+
+BluePlane.prototype.removePiece = function(_pieceId) 
+{
+    var removeIndex = -1;
+    for (let index = 0; index < this.meshCollection.length; index++) 
+    {
+        const element = this.meshCollection[index];
+        if (element.getId() === _pieceId)
+        {
+            removeIndex = index; 
+        }
+    }
+
+    if (removeIndex !== -1)
+    {
+        this.meshCollection.splice(removeIndex, 1);
+        this.setModifiedData(true);
+    }
+}
+
+BluePlane.prototype.setModifiedData = function(_value) 
+{
+    this.dataModified = _value;
+}
+
+BluePlane.prototype.isDataModified = function(_pieceId) 
+{
+    return this.dataModified;
+}
+
+ 
+// --------------------------------------------------------------- 
+// CLASS: spaceThree.js 
+// --------------------------------------------------------------- 
+// --------------------------------------------------------------------
+// Adapter to use Trhee.js instead my own 3D engine, 
+// their kung fuu is better. 
+//
+
+function SpaceThree() 
+{
+    this.camera = new Vector(0, 0, 0);
+    this.cameraYaw = 0;
+    this.cameraXaw = 0;
+    this.cameraZoom = 0;
+    this.normalsVisible = false;
+    this.linesVisible = false;
+    this.renderMode = Space.C_RENDER_MODE_TRIANGLE_FILL;
+    this.illuminationMode = Space.C_ILLUMINATOIN_MODE_LIGHT;
+
+    this.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
+    this.cameraControlEnabled = false;
+    this.ambientLightFactor = 0;    // 0 has no insidence, 1 full light.
+
+    this.viewWidth = 800;
+    this.viewHeight = 600;
+    this.viewOffsetX = 0;
+    this.viewOffsetY = 0;
+
+    // Space preview with ThreeJS
+    this.sceneT = new THREE.Scene();
+    this.cameraT = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+    this.rendererT = new THREE.WebGLRenderer();
+
+    // Init orbit
+    this.orbitControls = new THREE.OrbitControls( this.cameraT, this.rendererT.domElement );
+                
+    var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    this.mygroup = new THREE.Group();
+}
+
+SpaceThree.prototype.appendToDocumentBody = function() 
+{
+    document.body.appendChild( this.rendererT.domElement );
+}
+
+SpaceThree.prototype.setViewSize = function(_width, _height) 
+{
+    this.viewWidth = _width;
+    this.viewHeight = _height;
+    this.rendererT.setSize( 512, 320 );
+}
+
+SpaceThree.prototype.setViewOffset = function(_offsetX, _offsetY) 
+{
+    this.viewOffsetX = _offsetX;
+    this.viewOffsetY = _offsetY;
+}
+
+SpaceThree.prototype.setLight = function(_x, _y, _z) 
+{
+
+    //this.lightDirection.x = _x;
+    //this.lightDirection.y = _y;
+    //this.lightDirection.z = _z;
+
+    //this.lightDirection.normalize();
+}
+
+SpaceThree.prototype.addHemisphereLight = function(_skyColor, _groundColor) 
+{
+    var skyColor = _skyColor;  
+    var groundColor = _groundColor;  
+    var intensity = 1;
+    var light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+    this.sceneT.add(light);
+}
+
+SpaceThree.prototype.addDirectionalLight = function(_color, _x, _y, _z, _x2, _y2, _z2) 
+{
+    const color = _color;
+    const intensity = 1;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(_x, _y, _z);
+    light.target.position.set(_x2, _y2, _z2);
+    this.sceneT.add(light);
+    this.sceneT.add(light.target);
+}
+
+SpaceThree.prototype.setCamera = function(_x, _y, _z) 
+{
+    this.camera.x = Math.round(_x);
+    this.camera.y = Math.round(_y);
+    this.camera.z = Math.round(_z);
+
+    this.updateCameraT(this.getCamera(), this.getLookAtVector());
+}
+
+SpaceThree.prototype.updateCameraT = function(_camera, _lookAtVector) 
+{
+    this.cameraT.position.x = _camera.x;
+    this.cameraT.position.y = _camera.y;
+    this.cameraT.position.z = _camera.z * -1;
+
+    var x2 = this.cameraT.position.x + _lookAtVector.x;
+    var y2 = this.cameraT.position.y + _lookAtVector.y;
+    var z2 = this.cameraT.position.z + _lookAtVector.z * -1;
+    this.cameraT.lookAt( x2, y2, z2);
+
+    //this.cameraT.up.set( 0, 0, 1 );
+    this.cameraT.updateProjectionMatrix();
+}
+
+SpaceThree.prototype.addCameraZoom = function(_value) 
+{
+    this.cameraZoom += _value;
+}
+
+SpaceThree.prototype.subCameraZoom = function(_value) 
+{
+    this.cameraZoom -= _value;
+    if (this.cameraZoom <= 0)
+        this.cameraZoom = 0.01;
+}
+
+SpaceThree.prototype.getCamera = function() 
+{
+    return this.camera;
+}
+
+SpaceThree.prototype.updateIsometricCamera = function(_xaw, _yaw)
+{
+    this.updateCameraT(this.getCamera(), this.getLookAtVector());
+}
+SpaceThree.prototype.createRotateXMatrix = function(x) 
+{
+        var cosX = Math.cos(x);
+        var sinX = Math.sin(x);
+        var rotX = [
+            [1, 0, 0, 0],
+            [0, cosX, -sinX, 0],
+            [0, sinX, cosX,0],
+            [0, 0, 0, 1]
+        ];	
+
+        return rotX;				
+}
+
+SpaceThree.prototype.createRotateYMatrix = function(y) 
+{
+        var cosY = Math.cos(y);
+        var sinY = Math.sin(y);
+        var rotY = [
+            [cosY, 0, sinY, 0],
+            [0, 1, 0, 0],
+            [-sinY, 0, cosY, 0],
+            [0, 0, 0, 1]
+        ];	
+        
+        return rotY;				
+}
+SpaceThree.prototype.getLookAtVector = function() 
+{
+    return this.getLookAtVectorAt(this.cameraXaw, this.cameraYaw);
+}
+
+SpaceThree.prototype.getLookAtVectorAt = function(_xaw, _yaw) 
+{
+    var lookAt = new Vector(0, 0, 0);
+    var vTarget = new Vector(0, 0, 1);
+
+    var xawMatrix = this.createRotateXMatrix(_xaw);
+    var yawMatrix = this.createRotateYMatrix(_yaw);
+
+    Space.multiplyMatrixVectorOver(vTarget, xawMatrix);
+    Space.multiplyMatrixVectorOver(vTarget, yawMatrix);
+
+    lookAt.clone(vTarget);
+    return lookAt;
+}
+
+SpaceThree.prototype.update = function(_meshCollection, _forceThreeUpdate)
+{ 
+    gEngine.startTime("process");
+    
+    if (_forceThreeUpdate === false)
+        _forceThreeUpdate = this.checkIFSomeMeshMustBeUpdated(_meshCollection);
+
+    if (_forceThreeUpdate === true)
+    {
+        // Calculate render data for each mesh.
+        var meshItem = null;
+        for (var i = 0; i < _meshCollection.length; i++) 
+        {
+            meshItem = _meshCollection[i];
+            if (meshItem.hide === false)
+            {
+                var mesh = this.createRenderData(meshItem);
+                this.mygroup.add(mesh);
+            }    
+        }			
+        this.sceneT.add( this.mygroup );
+    }
+    
+    gEngine.showTimeDiff("process");
+
+    this.render();
+    
+    if (gEngine.logTimes === true)
+    {
+        console.log("Count triangles:", sceneTiranglesToRender.length, "(mesh =", _meshCollection.length, ")");
+    }
+}
+
+SpaceThree.prototype.checkIFSomeMeshMustBeUpdated = function(_meshCollection)
+{ 
+    var returnValue = false;
+    
+    for (var i = 0; i < _meshCollection.length; i++) 
+    {
+        if (_meshCollection[i].updateMeshBecauseTextureWasLoaded === true)
+        {
+            _meshCollection[i].updateMeshBecauseTextureWasLoaded = false;
+            returnValue = true;
+        }
+    }
+
+    return returnValue;
+}
+
+// COnvert MEsh to Three Shape and add to scene.
+SpaceThree.prototype.createRenderData = function(_mesh)
+{ 
+    if (typeof this.sceneT.getObjectById(this.mygroup.id) !== 'undefined')
+    {
+        JSGameEngine.chClearArray(this.mygroup.children);
+        this.sceneT.remove(this.mygroup);
+    }
+
+    // MATERIAL
+    var mycube_material = null;
+    if (_mesh.imgDataTexture !== null)
+    {
+        var loader = new THREE.TextureLoader();
+        var texture = null;
+        
+        if (C_MOCK_MODE === true)
+            texture = loader.load(mockedObj.get(_mesh.textureFileName));
+        else
+            texture = loader.load(_mesh.textureFileName);
+        
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.magFilter = THREE.NearestFilter;
+        var repeats = 1;
+        texture.repeat.set(repeats, repeats);
+
+        mycube_material = new THREE.MeshPhongMaterial({             
+            map: texture,
+            side: THREE.DoubleSide
+        });
+    }
+    else
+    {
+        var shColor = JSGameEngine.st_rgbaToColor( _mesh.meshColor.r, _mesh.meshColor.g,  _mesh.meshColor.b);
+        mycube_material = new THREE.MeshPhongMaterial( { color: shColor } );
+    }
+
+    // GEOMETRY
+    var mycube_geometry = new THREE.Geometry();
+
+    // Dump mesh data to THREE.mesn
+    for (var i = 0; i < _mesh.points.length; i++) 
+    {
+        mycube_geometry.vertices.push
+        (
+            new THREE.Vector3(
+                _mesh.points[i].x + _mesh.VectorCenter.x, 
+                _mesh.points[i].y + _mesh.VectorCenter.y, 
+                _mesh.points[i].z + _mesh.VectorCenter.z)
+        );
+    }
+
+    for (var i = 0; i < _mesh.faces.length; i++) 
+    {
+        mycube_geometry.faces.push
+        (
+            new THREE.Face3(_mesh.faces[i].x, _mesh.faces[i].y, _mesh.faces[i].z)
+        );
+    }
+
+    if (_mesh.imgDataTexture !== null)
+    {
+        for (var i = 0; i < _mesh.faces.length; i++) 
+        {
+            mycube_geometry.faceVertexUvs[0].push( 
+                [
+                    new THREE.Vector2(_mesh.tris[i].t[0].u, _mesh.tris[i].t[0].v), 
+                    new THREE.Vector2(_mesh.tris[i].t[1].u, _mesh.tris[i].t[1].v), 
+                    new THREE.Vector2(_mesh.tris[i].t[2].u, _mesh.tris[i].t[2].v) 
+                ]);
+        }
+    }
+
+    //mycube_geometry.computeBoundingSphere();
+    mycube_geometry.computeFaceNormals();
+
+    // MESH
+    var mycube_mesh = new THREE.Mesh(mycube_geometry, mycube_material );
+
+    // TRANSFORMATIONS
+    // Scale
+    mycube_mesh.scale.set(
+        _mesh.getScale().x, 
+        _mesh.getScale().y, 
+        _mesh.getScale().z); 
+
+    // Rotation
+    mycube_mesh.rotateX(_mesh.getRotation().x);
+    mycube_mesh.rotateY(_mesh.getRotation().y);
+    mycube_mesh.rotateZ(_mesh.getRotation().z);
+
+    // Position
+    mycube_mesh.position.set(
+        _mesh.position.x , 
+        _mesh.position.y , 
+        _mesh.position.z * -1);
+
+
+    return mycube_mesh;
+}
+
+SpaceThree.prototype.render = function()
+{ 
+    gEngine.startTime("draw");
+ 
+    this.rendererT.render( this.sceneT, this.cameraT );
+
+    gEngine.showTimeDiff("draw");	
+}
+
+SpaceThree.prototype.renderLookAt = function(_currentLayer)
+{ 
+    var vCamera = this.getCamera();
+    var vLookDir = this.getLookAtVector();
+
+    // Viewport
+    var rectSize = 100;
+    var r = {   
+        x1: 50,
+        y1: 10, 
+        x2: rectSize, 
+        y2: rectSize};
+    
+    var rmx = r.x1 + rectSize / 2;
+    var rmy = r.y1 + rectSize / 2;
+
+    gEngine.renderRectangle(r.x1, r.y1, rectSize, rectSize, 1, "green");
+    gEngine.renderLine(rmx, r.y1, rmx, r.y1 + rectSize, 1, "green");
+    gEngine.renderLine(r.x1, rmy, r.x1 + rectSize, rmy, 1, "green");
+
+    // Camera position			
+    var cameraPosText = "C Pos: " + Math.round(vCamera.x) + "," + Math.round(vCamera.y) + "," + Math.round(vCamera.z) + "";
+    gEngine.renderText(r.x1, r.y1 + rectSize + 10, cameraPosText, "green");
+
+    // Camera angles			
+    var cameraRotText = "C Ang: " + Math.round(JSGameEngine.radToGra (this.cameraXaw)) + "," + 
+    Math.round(JSGameEngine.radToGra (this.cameraYaw)) + "," + (this.cameraZoom).toFixed(2);
+    gEngine.renderText(r.x1, r.y1 + rectSize + 20, cameraRotText, "green");
+
+    // Cursor
+    var k = JSGameEngine.C_VIEWPORT_SCALE;
+
+    var mw = this.viewWidth / 2;
+    var mh = this.viewHeight / 2;
+    
+    var x1 = vCamera.x;
+    var y1 = vCamera.z;
+
+    var x2 = x1 * k + (vLookDir.x * JSGameEngine.C_VIEWPORT_CURSOR_LENGTH);
+    var y2 = y1 * k + (vLookDir.z * JSGameEngine.C_VIEWPORT_CURSOR_LENGTH);
+
+    gEngine.renderLine(rmx + x1 * k, rmy - y1 * k, rmx + x2, rmy - y2, 1, JSGameEngine.FG_WHITE);
+    gEngine.renderCircle(rmx + x1 * k, rmy - y1 * k, 2, 0, JSGameEngine.FG_WHITE);
+
+    // Projection information
+    var projectionInfo = ""
+    if (this.projectionType === Space.C_PROJECTION_TYPE_PERSPECTIVE)
+        projectionInfo = "P=P";
+    else
+        projectionInfo = "P=I";
+    gEngine.renderText(r.x1 - 30, r.y1 + 9, projectionInfo, "yellow");
+
+    // Illumination information
+    var fillTypeInfo = ""
+    if (this.illuminationMode === Space.C_ILLUMINATOIN_MODE_SOLID)
+        fillTypeInfo = "I=S";
+    else if (this.illuminationMode === Space.C_ILLUMINATOIN_MODE_LIGHT)
+        fillTypeInfo = "I=L";
+    gEngine.renderText(r.x1 - 30, r.y1 + 19, fillTypeInfo, "yellow");
+
+    // Wireframe information
+    var wireframeInfo = ""
+    if (this.renderMode === Space.C_RENDER_MODE_WIREFRAME)
+        wireframeInfo = "M=W";
+    else if (this.renderMode === Space.C_RENDER_MODE_TRIANGLE_FILL)
+        wireframeInfo = "M=T";
+    else if (this.renderMode === Space.C_RENDER_MODE_PIXEL_FILL)
+            wireframeInfo = "M=P";
+    gEngine.renderText(r.x1 - 30, r.y1 + 29, wireframeInfo, "yellow");
+
+    // Camera control information
+    var cameraControlInfo = ""
+    if (this.cameraControlEnabled === true)
+        cameraControlInfo = "C";
+    else
+        cameraControlInfo = "c";
+    gEngine.renderText(r.x1 - 30, r.y1 + 39, cameraControlInfo, "yellow");			
+
+    // Current layer.
+    if (_currentLayer !== -1)
+    {
+        gEngine.renderText(r.x1 - 30, r.y1 + 49, "CL=" + _currentLayer, "yellow");
+    }			     
+}
+
+SpaceThree.prototype.renderInfo = function()
+{ 
+}
+
+SpaceThree.prototype.changeRenderMode = function() 
+{
+    if (this.renderMode === Space.C_RENDER_MODE_WIREFRAME)
+        this.renderMode = Space.C_RENDER_MODE_TRIANGLE_FILL;
+    else if (this.renderMode === Space.C_RENDER_MODE_TRIANGLE_FILL)
+        this.renderMode = Space.C_RENDER_MODE_PIXEL_FILL;
+    else if (this.renderMode === Space.C_RENDER_MODE_PIXEL_FILL)
+        this.renderMode = Space.C_RENDER_MODE_WIREFRAME;
+}
+
+SpaceThree.prototype.changeProjectionType = function() 
+{
+    /*
+    if (this.projectionType === Space.C_PROJECTION_TYPE_ISOMETRIC)
+        this.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
+    else if (this.projectionType === Space.C_PROJECTION_TYPE_PERSPECTIVE)
+        this.projectionType = Space.C_PROJECTION_TYPE_ISOMETRIC;
+    */
+}
+
+SpaceThree.prototype.changeIlluminationMode = function() 
+{
+    if (this.illuminationMode === Space.C_ILLUMINATOIN_MODE_LIGHT)
+        this.illuminationMode = Space.C_ILLUMINATOIN_MODE_SOLID;
+    else if (this.illuminationMode === Space.C_ILLUMINATOIN_MODE_SOLID)
+        this.illuminationMode = Space.C_ILLUMINATOIN_MODE_LIGHT;
+}
+
+SpaceThree.prototype.changeNormalVisibility = function() 
+{
+    this.normalsVisible = !this.normalsVisible;
+}
  
 // --------------------------------------------------------------- 
 // CLASS: mockedObj.js 
@@ -5430,7 +5838,7 @@ mockedObj.set('http://localhost:8080/obj/oak.jpg'.toLowerCase(), item);
 // Entry point to the aplication, main loop, inputs controlle, core
 //
 
-var C_VERSION_TITLE = "Little constructor (based on JSEngine) v1.3";
+var C_VERSION_TITLE = "Little constructor ThreeJS (based on JSEngine + ThreeJS) v2.0";
 var gEngine = null; 
 var C_SERVER_IP = "localhost:8080";
 
@@ -5457,7 +5865,7 @@ function load()
 // --------------------------------------------------------------------
 // Game data
 //
-var spacePreview = new Space();
+var spacePreview = new SpaceThree();
 var spaceWired = new Space();
 var bluePlane = new BluePlane();
 var helpMode = false;
@@ -5471,68 +5879,53 @@ var defaultOffY = 0;
 var defaultOffZ = 0;
 var defaultIndex = 0;
 
-/* For test Three.js
-var meshes = new Array();
-var piece = null;
-*/
-
 function onUserCreate() 
 {
     console.log("User create");
 
+    /*
     gEngine.showTimes(false);
-
-    /* For test Three.js
-    var meshes = new Array();
-    piece = PieceFactory.getInstance().createPiece(PieceFactory.WINDOW);
-    meshes.push(piece.mesh);
-    spacePreview.setMeshCollection(meshes);
     */
-    
-    // Space preview.
-    spacePreview.setViewSize(800, 340);
-    spacePreview.setViewOffset(0, 0);
 
-    spacePreview.normalsVisible = false;
-    spacePreview.linesVisible = false;
-    spacePreview.setLight(0, 500, 0);
-    spacePreview.ambientLightFactor = 0.5;
-    spacePreview.projectionType = Space.C_PROJECTION_TYPE_ISOMETRIC;
-
-    spacePreview.setCamera(-180, 0, -180);
-    spacePreview.cameraXaw = JSGameEngine.graToRad(-26);
-    spacePreview.cameraYaw = JSGameEngine.graToRad(-43);
-    spacePreview.addCameraZoom(1.4);
-    spacePreview.updateIsometricCamera(spacePreview.cameraXaw, spacePreview.cameraYaw);
-    bluePlane.setSpace(spacePreview);
-    
-    /* For test Three.js
-    //bluePlane.setSpace(spacePreview);
-    spacePreview.setMeshCollection(meshes);
-    */
-    
     // Space wired and top.
     spaceWired.setViewSize(800, 240);
-    spaceWired.setViewOffset(0, 350);
-
+    spaceWired.setViewOffset(0, 10);
     spaceWired.normalsVisible = false;
     spaceWired.linesVisible = false;
     spaceWired.renderMode = Space.C_RENDER_MODE_WIREFRAME;
     spaceWired.setLight(0, 500, 0);
     spaceWired.ambientLightFactor = 0.5;
     spaceWired.projectionType = Space.C_PROJECTION_TYPE_ISOMETRIC;
-
     spaceWired.setCamera(0, 300, 0);
+
     spaceWired.cameraXaw = JSGameEngine.graToRad(-90);
     spaceWired.addCameraZoom(1.25);
     spaceWired.updateIsometricCamera(spaceWired.cameraXaw, spaceWired.cameraYaw);
-    spaceWired.setMeshCollection(spacePreview.getMeshCollection());
-	
-    /* For test Three.js
-    //spaceWired.setMeshCollection(spacePreview.getMeshCollection());
-    spaceWired.setMeshCollection(meshes);
-    */
+    
+    // Space preview.
+    spacePreview.appendToDocumentBody();
+    spacePreview.setViewSize(512, 320);
+    spacePreview.setViewOffset(0, 0);
+    spacePreview.normalsVisible = false;
+    spacePreview.linesVisible = false;
+    //spacePreview.setLight(0, 500, 0);
+    //spacePreview.addHemisphereLight(0xB1E1FF, 0xB97A20);
+    spacePreview.addDirectionalLight(0xFFA0A0, 500, 200  ,-500,   0,0,0);
+    spacePreview.addDirectionalLight(0xA0FFA0, -500, 200  ,-500,   0,0,0);
 
+    spacePreview.addDirectionalLight(0xA0A0FF, 500, 200  ,500,   0,0,0);
+    spacePreview.addDirectionalLight(0xA0A0A0, -500, 200 ,500,   0,0,0);
+
+    spacePreview.ambientLightFactor = 0.5;
+    spacePreview.projectionType = Space.C_PROJECTION_TYPE_PERSPECTIVE;
+    spacePreview.setCamera(0, 80, -10);
+
+/*    
+    var pieceTestCollection = new Array();
+    var piecePilar = PieceFactory.getInstance().createPiece(PieceFactory.PILAR_SMALL);
+    piecePilar.mesh.setPosition(0, 0, -100);
+    bluePlane.addMesh(piecePilar.mesh);
+*/
 }
 
 function onUserUpdate() 
@@ -5545,21 +5938,21 @@ function onUserUpdate()
      
     if (helpMode === false)
     {
-        /* For test Three.js
-        //piece.mesh.addAngleX(0.01);
-        //piece.mesh.addAngleY(0.02);
-	    */
-	
-        spaceWired.update();
+        spaceWired.update(bluePlane.getMeshCollection(), bluePlane.isDataModified());
         spaceWired.renderInfo();
+        spaceWired.renderLookAt(bluePlane.currentLayer);
 
-        spacePreview.update();
-        spacePreview.renderLookAt(spacePreview, bluePlane.currentLayer);
+        spacePreview.update(bluePlane.getMeshCollection(), bluePlane.isDataModified());
+        spacePreview.renderInfo();
+        spacePreview.renderLookAt(bluePlane.currentLayer);
+
+        bluePlane.setModifiedData(false);
     }
     else
     {
         showHelpScreen();
     }
+    
 }
 
 function processInputs()
@@ -5663,6 +6056,8 @@ function processInputsCameraEnabled()
             if (gEngine.isKeyPressed(C_KEY_DOWN) === true)
                 spacePreview.getCamera().sub(vForward);
         }
+
+        spacePreview.updateIsometricCamera(spacePreview.cameraXaw, spacePreview.cameraYaw);
     }
     else
     {

@@ -1,4 +1,4 @@
-set OUTPUTFILE=appLittleConstructor.js
+set OUTPUTFILE=appLittleConstructorThreeJS.js
 set JS_DIR=js
 set OBJ_DIR=obj
 set MOCKED_FILE=mockedObj.js
@@ -18,6 +18,8 @@ call addFileWithHeader.bat %OUTPUTFILE% %JS_DIR% pieceFactory.js
 call addFileWithHeader.bat %OUTPUTFILE% %JS_DIR% linkPoint.js 
 call addFileWithHeader.bat %OUTPUTFILE% %JS_DIR% cursor.js 
 call addFileWithHeader.bat %OUTPUTFILE% %JS_DIR% bluePlane.js 
+
+call addFileWithHeader.bat %OUTPUTFILE% %JS_DIR% spaceThree.js 
 
 REM Convert all .ojb files to .var files.
 call java -jar file2var.jar -i %OBJ_DIR%\cursorMark.OBJ -o %OBJ_DIR%\cursorMark.VAR

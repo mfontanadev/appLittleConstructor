@@ -22,10 +22,15 @@ function Mesh()
     this.worldMatrix = Space.createMatrixIdentity();
     this.imgTexture = new Image();
     this.imgDataTexture = null;
+    this.updateMeshBecauseTextureWasLoaded = false;
     this.materialFileName = "";
     this.textureFileName = "";
     this.alpha = 1;
     this.hide = false;
+
+    this.points = new Array();
+    this.faces = new Array();
+
     this.meshColor = {r:128, g:128, b:128, a:1};
 }
 
@@ -141,6 +146,7 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
                     parseFloat(splittedRow[2]), 
                     parseFloat(splittedRow[3]), 
                     1);
+            this.points.push(vector);
 
             cacheVertexes.push(vector);
 
@@ -245,6 +251,9 @@ Mesh.prototype.generateMeshFromFileData = function(_meshData)
             }
         }
 
+        var face = new Vector(v1, v2, v3);
+	    this.faces.push(face);
+			    
         this.addTriangle(tri);
     }   
 
@@ -614,6 +623,7 @@ Mesh.prototype.loadTextureFile = function(_url)
             newContext.drawImage(_this.imgTexture, 0, 0);
 
             _this.imgDataTexture = newContext.getImageData(0, 0,imgWidth, imgHeight);
+            _this.updateMeshBecauseTextureWasLoaded = true;
         }
     }			
 
