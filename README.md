@@ -31,10 +31,10 @@ Take source code from master and change the render engine to use ThreeJS.
 <table>
 	<tr>
 		<th width="360px" align="center">
-		<img width="260px" src="https://github.com/mfontanadev/appLittleConstructor/blob/master/doc/poc_house_jsengine_textured.PNG?raw=true">
+		<img width="360px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJS/doc/poc_house_jsengine_textured.PNG?raw=true">
 		</th>
 		<th width="360px" align="center">
-		<img width="190px" src="https://github.com/mfontanadev/appLittleConstructor/blob/master/doc/poc_house_threejs-engine_textured.PNG?raw=true">
+		<img width="360px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJS/doc/poc_house_threejs-engine_textured.PNG?raw=true">
 		</th>
 	</tr>
 	<tr>
