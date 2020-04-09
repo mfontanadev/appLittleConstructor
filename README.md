@@ -19,6 +19,7 @@ Take source code from master and change the render engine to use ThreeJS.
 	</tr>
 </table>
 
+
 ## Enjoy at
 
 [http://mfontanadev.github.io/games/deployLittleConstructorThreeJS/index.html](http://mfontanadev.github.io/games/deployLittleConstructorThreeJS/index.html)
@@ -45,7 +46,23 @@ Take source code from master and change the render engine to use ThreeJS.
 			ThreeJS render engine
 		</th>
 	</tr>
+	<tr>
+	<th colspan="2" align="center">
+        <br>
+    </th>
+    </tr>
+	<tr>
+	<th colspan="2" align="center">
+	<img width="640px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJS/doc/poc_house_egine_diff.png?raw=true">
+	</th>
+	</tr>
+	<tr>
+	<th colspan="2" align="center">
+	Files difference (left side: my 3D engine / right side: Three.js engine).
+	</th>
+	</tr>
 </table>
+
 
 ## Building a new version
 
