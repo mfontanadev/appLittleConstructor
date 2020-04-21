@@ -1,3 +1,4 @@
+
 set OUTPUTFILE=appLittleConstructorThreeJS.js
 set JS_DIR=js
 set OBJ_DIR=obj
