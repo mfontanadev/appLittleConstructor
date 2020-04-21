@@ -482,7 +482,7 @@ function showHelpScreen()
     gEngine.locateText(3, 25, "Up/Down:select piece when they are stacked in a column.");
     gEngine.locateText(3, 26, "RETURN:rotate the selected piece.");
 
-    gEngine.locateText(1, 28, "See more at: http://mfontanadevhome.appspot.com/");
+    gEngine.locateText(1, 28, "See more at: https://mfontanadev.github.io");
     gEngine.setFontSize(9);
 
 }

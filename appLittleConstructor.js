@@ -4,51 +4,52 @@ First: thanks to @Javidx9, this was inspired in his youtube tutorials
     "Tredimensjonal Grafikk" - @Javidx9
 
 Second: license
-*/
 
-/*
-http://mfontanadevhome.appspot.com/ - Little Constructor - 3dEngineJS hyper minimal.
-@mfontanadev
+Third: about this and me.
 
 License
 ~~~~~~~
-Little contructor Copyright (C) 2018  MFontanadev
+JSEngine Senoid (Playing with hyper minimal 3dEngineJS). 
+Copyright (C) 2020 mfontanadev.
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions; See license for details.
+
 Original works located at:
-PENDIENTE https://www.github.com/onelonecoder
+https://github.com/mfontanadev
 
-http://mfontanadevhome.appspot.com/
-PENDIENTE https://www.youtube.com/javidx9
-
-GNU GPLv3
-PENDIENTE https://github.com/OneLoneCoder/videos/blob/master/LICENSE
-
-From MFontanadev :)
+From mfontanadev :)
 ~~~~~~~~~~~~~~~
 Hello! Use this as like as you want, I hope you can create amazing things 
 and have a lot of fun. Let me know. You acknowledge
 that I am not responsible for anything bad that happens as a result of
 your actions. However this code is protected by GNU GPLv3, see the license in the
 github repo. This means you must attribute me if you use it. You can view this
-license here: PENDIENTE https://github.com/OneLoneCoder/videos/blob/master/LICENSE
+license here: https://github.com/mfontanadev/POCs/blob/master/LICENSE
 Cheers!
+
 Background
 ~~~~~~~~~~
-This programm has two layers, first you can use it likea 3dEngine, second,
+Sources: https://github.com/mfontanadev/appLittleConstructor - Little Constructor - 3dEngineJS hyper minimal.
+
+This programm has two layers, first you can use it like a 3dEngine, second,
 you can use it to build virtual houses. I hope this programm can inspire you
 to make your own one.
+
 Video
 ~~~~~
-PENDIENTE https://youtu.be/ih20l3pJoeU
+PENDING
+
 Author
 ~~~~~~
-Twitter: @mfontanadev
-PENDIENTE Blog: http://www.onelonecoder.com
-Discord: https://discord.gg/WhwHUMV
-Last Updated: 10/10/2019
-*/ 
+site: https://mfontanadev.github.io
+twitter: https://twitter.com/mfontanadev
+git: https://github.com/mfontanadev
+linkedin: https://www.linkedin.com/in/mauricio-fontana-8285681b/?originalSubdomain=ar
+
+Last Updated: 20/04/2020
+*/
+ 
 // --------------------------------------------------------------- 
 // CLASS: jsGameEngine.js 
 // --------------------------------------------------------------- 
@@ -5910,7 +5911,7 @@ function showHelpScreen()
     gEngine.locateText(3, 25, "Up/Down:select piece when they are stacked in a column.");
     gEngine.locateText(3, 26, "RETURN:rotate the selected piece.");
 
-    gEngine.locateText(1, 28, "See more at: http://mfontanadevhome.appspot.com/");
+    gEngine.locateText(1, 28, "See more at: https://mfontanadev.github.io");
     gEngine.setFontSize(9);
 
 }
