@@ -3,6 +3,8 @@
  
 App that let you create houses using basic geometrial shapes. Do not forget use camera to go inside it.
 
+**IMPORTANT: master branch is the first intent, see other brachs for upgraded versions, they are an evolution of this one.**
+
 ## Enjoy at
 [http://mfontanadev.github.io/games/deployLittleConstructor/index.html](http://mfontanadev.github.io/games/deployLittleConstructor/index.html)
 
