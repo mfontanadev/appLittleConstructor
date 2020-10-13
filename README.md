@@ -14,7 +14,7 @@ Take source code from branch ThreeJS and rethink the user interface.
 	</tr>
 	<tr>
 	<th align="center">
-	Replacing engine.
+	Replacing vehicle bodywork.
 	</th>
 	</tr>
 </table>
@@ -36,7 +36,7 @@ Take source code from branch ThreeJS and rethink the user interface.
 	</tr>
 	<tr>
 	<th align="center">
-	Replacing engine.
+	Replacing UX.
 	</th>
 	</tr>
 </table>
