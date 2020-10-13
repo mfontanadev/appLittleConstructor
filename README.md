@@ -1,15 +1,15 @@
-# App "Little constructor" branch ThreeJS
+# App "Little constructor" branch ThreeJSEx
 
-App that let you create houses using basic geometrial shapes. Do not forget use camera to go inside it. In this branch you can use orbit controls from ThreeJS. More details at branch master, [https://github.com/mfontanadev/appLittleConstructor](https://github.com/mfontanadev/appLittleConstructor).
+App that let you create houses using basic geometrial shapes. I will try to add a flying camera. In this branch you have a new user experience and it works on mobile. More details at branch master, [https://github.com/mfontanadev/appLittleConstructor](https://github.com/mfontanadev/appLittleConstructor).
 
 
-## Why this branch?
+## What's the idea for this branch?
 
-Take source code from master and change the render engine to use ThreeJS.
+Take source code from branch ThreeJS and rethink the user interface.
 <table>
 	<tr>
 	<th width="640px" align="center">
-	<img width="640px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJS/doc/Engine%20Change.PNG?raw=true">
+	<img width="640px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJSEx/doc/appLittleConstructorThreeJSEx_diff1.png?raw=true">
 	</th>
 	</tr>
 	<tr>
@@ -19,54 +19,40 @@ Take source code from master and change the render engine to use ThreeJS.
 	</tr>
 </table>
 
-
 ## Enjoy at
 
-[http://mfontanadev.github.io/games/deployLittleConstructorThreeJS/index.html](http://mfontanadev.github.io/games/deployLittleConstructorThreeJS/index.html)
+[http://mfontanadev.github.io/games/deployLittleConstructorThreeJS/index.html](http://mfontanadev.github.io/games/deployLittleConstructorThreeJSEx/index.html)
 
 ## Comparison
-- Both versions suport load a file with texture.
-- ThreeJS has orbit controls.
-- ThreeJS use object manager from non ThreeJS version.
+- ThreeJSEx has no textures.
+- ThreeJSEx has no orbit controls.
+- ThreeJSEx has an user friendly interface (this compensates all the rest)
 
 <table>
 	<tr>
-		<th width="360px" align="center">
-		<img width="360px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJS/doc/poc_house_jsengine_textured.PNG?raw=true">
-		</th>
-		<th width="360px" align="center">
-		<img width="360px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJS/doc/poc_house_threejs-engine_textured.PNG?raw=true">
-		</th>
-	</tr>
-	<tr>
-		<th align="center">
-			Custom render engine
-		</th>
-		<th align="center">
-			ThreeJS render engine
-		</th>
-	</tr>
-	<tr>
-	<th colspan="2" align="center">
-        <br>
-    </th>
-    </tr>
-	<tr>
-	<th colspan="2" align="center">
-	<img width="640px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJS/doc/poc_house_egine_diff.png?raw=true">
+	<th width="640px" align="center">
+	<img width="640px" src="https://github.com/mfontanadev/appLittleConstructor/blob/ThreeJSEx/doc/appLittleConstructorThreeJSEx_diff2.png?raw=true">
 	</th>
 	</tr>
 	<tr>
-	<th colspan="2" align="center">
-	Files difference (left side: my 3D engine / right side: Three.js engine).
+	<th align="center">
+	Replacing engine.
 	</th>
 	</tr>
 </table>
 
-
 ## Building a new version
 
-Same as README.md from [https://github.com/mfontanadev/appLittleConstructor](https://github.com/mfontanadev/appLittleConstructor)
+The idea is merge all files in one fat .js file. To do that, you can use batch files or make your own merge. You can use merge process for you own porpouses, if you want. So, follow the next steps:
+
+1. Go to root dir and locate combinetype.bat (this works on Windows). Run as is, with no arguments.
+NOTE: if you want to set version number, please find a line similar to "var C_VERSION_TITLE = ....", this is a very simple way to identify it at running time.
+
+2. You must see a new file called appLittleConstructorThreeJSEx.js.
+
+3. This version makes a folder called "build", it is used for deploy the application on my site.
+
+For details about the origins of building process, see README.md from [https://github.com/mfontanadev/appLittleConstructor](https://github.com/mfontanadev/appLittleConstructor)
 
 ## Code explanation
 
