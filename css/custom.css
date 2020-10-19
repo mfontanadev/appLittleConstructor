@@ -1,0 +1,357 @@
+body {
+    background-color: #f0f0f0;
+    color: #444;
+}
+
+a {
+    color: #08f;
+}
+
+#menubar {
+    position: absolute;
+    width: 100%;
+    height: 32px;
+    background: #ddd;
+    padding: 0;
+    margin: 0;
+    right: 0;
+    top: 0;
+}
+    #menubar .menu {
+        float: left;
+        cursor: pointer;
+        padding-right: 8px;
+    }
+
+    #menubar .menu .right {
+        float: right;
+        cursor: auto;
+        padding-right: 0;
+        text-align: right;
+    }
+
+    #menubar .menu .title {
+        display: inline-block;
+        color: #888;
+        margin: 0;
+        padding: 8px;
+        line-height: 16px;
+    }
+
+    #menubar .menu .options {
+        position: fixed;
+        display: none;
+        padding: 5px 0;
+        background: #ddd;
+        width: 150px;
+        max-height: calc(100% - 80px);
+        overflow: auto;
+    }
+
+    #menubar .menu:hover .options {
+        display: block;
+        z-index: 1000;
+    }
+
+        #menubar .menu .options hr {
+            border-color: #ddd;
+        }
+
+        #menubar .menu .options .option {
+            color: #666;
+            background: #ddd;
+            padding: 5px 10px;
+            margin: 0 !important;
+        }
+
+            #menubar .menu .options .option:hover {
+                color: #fff;
+                background-color: #08f;
+            }
+
+            #menubar .menu .options .option:active {
+                color: #666;
+                background: #ddd;
+            }
+
+    #menubar .menu .options .inactive {
+        color: #bbb;
+        background: #ddd;
+        padding: 5px 10px;
+        margin: 0 !important;
+    }
+
+
+#toolbar {
+    position: absolute;
+    left: 10px;
+    top: 42px;
+    width: 32px;
+    background: #eee;
+    text-align: center;
+}
+
+    #toolbar button, #toolbar input {
+        height: 32px;
+    }
+
+        #toolbar button img {
+            width: 16px;
+            opacity: 0.9;
+        }
+
+
+#pieceToolbar {
+    position: absolute;
+    top: 112px;
+    right: 10px;
+    width: 48px;
+    background: #eee;
+    text-align: center;
+}
+
+    #pieceToolbar button, #pieceToolbar input {
+        width: 48px;
+    }
+
+        #pieceToolbar button img {
+            height: 32px;
+            opacity: 0.9;
+        }        
+
+#pieceActionsToolbar {
+    position: absolute;
+    right: 10px;
+    top: 42px;
+    height: 32px;
+    background: #eee;
+    text-align: center;
+}
+
+    #pieceActionsToolbar button, #pieceActionsToolbar input {
+        height: 32px;
+    }
+
+        #pieceActionsToolbar button img {
+            width: 16px;
+            opacity: 0.9;
+        }
+
+button 
+{
+    color: #555;
+    background-color: #ddd;
+    border: 0px;
+    margin: 0px; /* GNOME Web */
+    padding: 5px 8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    outline: none;
+}
+
+    button:hover {
+        background-color: #fff;
+    }
+
+    button.active {
+        background-color: #999;
+    }
+
+    button.selected {
+        background-color: #aaa;
+    }
+
+.Panel {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+
+    /* No support for these yet */
+    -o-user-select: none;
+    user-select: none;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+  
+  /* The Close Button */
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+ 
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+
+  #btnRotatePanel {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    width: 32px;
+    background: #eee;
+    text-align: center;
+}
+
+    #btnRotatePanel button, #btnRotatePanel input {
+        height: 32px;
+    }
+
+        #btnRotatePanel button img {
+            width: 16px;
+            opacity: 0.9;
+        }
+
+.sliderContainerH {
+    position: absolute;
+    left: 50px;
+    bottom: 10px;
+    width: 100px;
+}
+
+.sliderContainerV {
+    position: absolute;
+    left: 10px;
+    bottom: 50px;
+}
+
+input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+    width: 32px;
+    height: 100px;
+}
+
+#btnZoomInPanel {
+    position: absolute;
+    left: 10px;
+    top: 42px;
+    width: 32px;
+    background: #eee;
+    text-align: center;
+}
+
+    #btnZoomInPanel button, #btnZoomInPanel input {
+        height: 32px;
+    }
+
+        #btnZoomInPanel button img {
+            width: 16px;
+            opacity: 0.9;
+        }
+
+#sliderContainerZoomV {
+    position: absolute;
+    left: 10px;
+    top: 80px;
+    width: 100px;
+}
+
+#btnZoomOutPanel {
+    position: absolute;
+    left: 10px;
+    top: 189px;
+    width: 32px;
+    background: #eee;
+    text-align: center;
+}
+
+    #btnZoomOutPanel button, #btnZoomOutPanel input {
+        height: 32px;
+    }
+
+        #btnZoomOutPanel button img {
+            width: 16px;
+            opacity: 0.9;
+        }
+
+#btnFlyingPanel {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 32px;
+    background: #eee;
+    text-align: center;
+}
+
+    #btnFlyingPanel button, #btnFlyingPanel input {
+        height: 32px;
+    }
+
+        #btnFlyingPanel button img {
+            width: 16px;
+            opacity: 0.9;
+        }
+        
+#btnCancelFlyingPanel {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 32px;
+    background: #eee;
+    text-align: center;
+}
+
+    #btnCancelFlyingPanel button, #btnCancelFlyingPanel input {
+        height: 32px;
+    }
+
+        #btnCancelFlyingPanel button img {
+            width: 16px;
+            opacity: 0.9;
+        }
+
+
+#btnCross {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    width: 150px;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+#btnUpDown {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    width: 150px;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+#btnPointer {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    width: 10px;
+    pointer-events: none;
+}
