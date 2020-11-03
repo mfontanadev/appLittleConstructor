@@ -3644,7 +3644,7 @@ SpaceThree.prototype.cancelFlyingControl = function()
 // Entry point to the aplication, main loop, inputs controlle, core
 //
 
-var C_VERSION_TITLE = "Little constructor ThreeJS v3.1.1";
+var C_VERSION_TITLE = "Little constructor ThreeJS v3.1.2";
 var gEngine = null; 
 var C_SERVER_IP = "localhost:8080";
 

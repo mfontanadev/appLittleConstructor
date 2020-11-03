@@ -10,7 +10,7 @@ a {
 #menubar {
     position: absolute;
     width: 100%;
-    height: 32px;
+    height: 38px;
     background: #ddd;
     padding: 0;
     margin: 0;
@@ -84,56 +84,63 @@ a {
 
 #toolbar {
     position: absolute;
-    left: 10px;
-    top: 42px;
-    width: 32px;
+    left: 4px;
+    top: 38px;
+    height: 38px;
+    width: 38px;
     background: #eee;
     text-align: center;
 }
 
     #toolbar button, #toolbar input {
-        height: 32px;
+        height: 38px;
+        width: 38px;
     }
 
         #toolbar button img {
-            width: 16px;
+            height: 30px;
+            width: 30px;
             opacity: 0.9;
         }
 
 
 #pieceToolbar {
     position: absolute;
-    top: 112px;
-    right: 10px;
-    width: 48px;
+    top: 42px;
+    right: 4px;
+    width: 38px;
     background: #eee;
     text-align: center;
 }
 
     #pieceToolbar button, #pieceToolbar input {
-        width: 48px;
+        height: 38px;
+        width: 38px;
     }
 
         #pieceToolbar button img {
-            height: 32px;
+            height: 30px;
+            width: 30px;
             opacity: 0.9;
         }        
 
 #pieceActionsToolbar {
     position: absolute;
-    right: 10px;
-    top: 42px;
-    height: 32px;
+    right: 4px;
+    bottom: 10px;
+    height: 38px;
     background: #eee;
     text-align: center;
 }
 
     #pieceActionsToolbar button, #pieceActionsToolbar input {
-        height: 32px;
+        height: 38px;
+        width: 38px;
     }
 
         #pieceActionsToolbar button img {
-            width: 16px;
+            height: 30px;
+            width: 30px;
             opacity: 0.9;
         }
 
@@ -143,7 +150,7 @@ button
     background-color: #ddd;
     border: 0px;
     margin: 0px; /* GNOME Web */
-    padding: 5px 8px;
+    padding: 4px 4px;
     text-transform: uppercase;
     cursor: pointer;
     outline: none;
@@ -213,19 +220,22 @@ button
 
   #btnRotatePanel {
     position: absolute;
-    left: 10px;
+    left: 4px;
     bottom: 10px;
-    width: 32px;
+    height: 38px;
+    width: 38px;
     background: #eee;
     text-align: center;
 }
 
     #btnRotatePanel button, #btnRotatePanel input {
-        height: 32px;
+        height: 38px;
+        width: 38px;
     }
 
         #btnRotatePanel button img {
-            width: 16px;
+            height: 30px;
+            width: 30px;
             opacity: 0.9;
         }
 
@@ -238,7 +248,7 @@ button
 
 .sliderContainerV {
     position: absolute;
-    left: 10px;
+    left: 4px;
     bottom: 50px;
 }
 
@@ -246,86 +256,98 @@ input[type=range][orient=vertical]
 {
     writing-mode: bt-lr; /* IE */
     -webkit-appearance: slider-vertical; /* WebKit */
-    width: 32px;
+    width: 30px;
     height: 100px;
 }
 
 #btnZoomInPanel {
     position: absolute;
-    left: 10px;
-    top: 42px;
-    width: 32px;
+    left: 4px;
+    top: 84px;
+    height: 38px;
+    width: 38px;
     background: #eee;
     text-align: center;
 }
 
     #btnZoomInPanel button, #btnZoomInPanel input {
-        height: 32px;
+        height: 38px;
+        width: 38px;
     }
 
         #btnZoomInPanel button img {
-            width: 16px;
+            height: 30px;
+            width: 30px;
             opacity: 0.9;
         }
 
 #sliderContainerZoomV {
     position: absolute;
-    left: 10px;
-    top: 80px;
+    left: 4px;
+    top: 122px;
     width: 100px;
 }
 
 #btnZoomOutPanel {
     position: absolute;
-    left: 10px;
-    top: 189px;
-    width: 32px;
+    left: 4px;
+    top: 231px;
+    height: 30px;
+    width: 38px;
     background: #eee;
     text-align: center;
 }
 
     #btnZoomOutPanel button, #btnZoomOutPanel input {
-        height: 32px;
+        height: 38px;
+        width: 38px;
     }
 
         #btnZoomOutPanel button img {
-            width: 16px;
+            height: 30px;
+            width: 30px;
             opacity: 0.9;
         }
 
 #btnFlyingPanel {
     position: absolute;
-    right: 10px;
-    bottom: 10px;
-    width: 32px;
+    left: 4px;
+    top: 42px;
+    height: 38px;
+    width: 38px;
     background: #eee;
     text-align: center;
 }
 
     #btnFlyingPanel button, #btnFlyingPanel input {
-        height: 32px;
+        height: 38px;
+        width: 38px;
     }
 
         #btnFlyingPanel button img {
-            width: 16px;
+            height: 30px;
+            width: 30px;
             opacity: 0.9;
         }
         
 #btnCancelFlyingPanel {
     position: absolute;
-    right: 10px;
-    bottom: 10px;
-    width: 32px;
+    left: 4px;
+    top: 42px;
+    height: 38px;
+    width: 38px;
     background: #eee;
     text-align: center;
 }
 
     #btnCancelFlyingPanel button, #btnCancelFlyingPanel input {
-        height: 32px;
+        height: 38px;
+        width: 38px;
     }
 
         #btnCancelFlyingPanel button img {
-            width: 16px;
+            height: 30px;
+            width: 30px;
             opacity: 0.9;
         }
 
